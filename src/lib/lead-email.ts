@@ -6,7 +6,13 @@ type Decision = "accepted" | "rejected";
 
 export type LeadEmailResult =
   | { sent: true }
-  | { sent: false; reason: "not_configured" | "invalid_email" | "provider_error" };
+  | {
+      sent: false;
+      reason: "not_configured" | "invalid_email" | "provider_error";
+      providerStatus?: number;
+      providerCode?: string;
+      providerMessage?: string;
+    };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BREVO_EMAIL_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
@@ -118,10 +124,30 @@ export async function sendLeadDecisionEmail(
       }),
       signal: AbortSignal.timeout(10_000),
     });
-    return response.ok
-      ? { sent: true }
-      : { sent: false, reason: "provider_error" };
-  } catch {
-    return { sent: false, reason: "provider_error" };
+    if (response.ok) return { sent: true };
+
+    const errorBody = await response.json().catch(() => null);
+    const providerCode =
+      errorBody && typeof errorBody.code === "string"
+        ? errorBody.code.slice(0, 100)
+        : undefined;
+    const providerMessage =
+      errorBody && typeof errorBody.message === "string"
+        ? errorBody.message.replace(EMAIL_PATTERN, "[email]").slice(0, 200)
+        : undefined;
+
+    return {
+      sent: false,
+      reason: "provider_error",
+      providerStatus: response.status,
+      providerCode,
+      providerMessage,
+    };
+  } catch (error) {
+    return {
+      sent: false,
+      reason: "provider_error",
+      providerCode: error instanceof Error && error.name === "TimeoutError" ? "timeout" : "network_error",
+    };
   }
 }

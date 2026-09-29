@@ -75,6 +75,9 @@ export async function PATCH(req: Request) {
       leadId: id,
       status,
       reason: result.reason,
+      providerStatus: result.reason === "provider_error" ? result.providerStatus : undefined,
+      providerCode: result.reason === "provider_error" ? result.providerCode : undefined,
+      providerMessage: result.reason === "provider_error" ? result.providerMessage : undefined,
     });
     return NextResponse.json({
       ok: true,
