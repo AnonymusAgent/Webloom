@@ -15,7 +15,13 @@ export function Tracker() {
   useEffect(() => {
     if (pathname.startsWith("/admin")) return;
     const ref = document.referrer;
-    const external = ref && !ref.startsWith(window.location.origin) ? ref : "";
+    let external = "";
+    try {
+      const referrer = new URL(ref);
+      if (referrer.origin !== window.location.origin) external = referrer.origin;
+    } catch {
+      /* omit an empty or invalid referrer */
+    }
     const t = setTimeout(() => {
       fetch("/api/track", {
         method: "POST",

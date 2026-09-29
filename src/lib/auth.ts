@@ -5,11 +5,23 @@ const COOKIE = "wl_admin";
 const MAX_AGE = 60 * 60 * 12; // 12h
 
 function secret() {
-  return process.env.ADMIN_SECRET || process.env.ADMIN_PASSWORD || "webloom-dev-secret";
+  if (process.env.ADMIN_SECRET) return process.env.ADMIN_SECRET;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("ADMIN_SECRET must be configured in production.");
+  }
+  return process.env.ADMIN_PASSWORD || "webloom-dev-secret";
 }
 
 export function adminPassword() {
-  return process.env.ADMIN_PASSWORD || "webloom";
+  if (process.env.ADMIN_PASSWORD) return process.env.ADMIN_PASSWORD;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("ADMIN_PASSWORD must be configured in production.");
+  }
+  return "webloom";
+}
+
+export function isAdminConfigured() {
+  return Boolean(process.env.ADMIN_PASSWORD && process.env.ADMIN_SECRET);
 }
 
 function sign(payload: string) {
@@ -24,7 +36,7 @@ export function createToken() {
 }
 
 export function verifyToken(token?: string | null) {
-  if (!token) return false;
+  if (!token || (process.env.NODE_ENV === "production" && !isAdminConfigured())) return false;
   const [payload, sig] = token.split(".");
   if (!payload || !sig) return false;
   const expected = sign(payload);

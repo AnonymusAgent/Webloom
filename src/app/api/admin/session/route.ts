@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
-import { adminPassword, COOKIE, createToken, isAdmin, MAX_AGE } from "@/lib/auth";
+import { adminPassword, COOKIE, createToken, isAdmin, isAdminConfigured, MAX_AGE } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { log } from "@/lib/data";
 
@@ -11,9 +11,16 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  if (process.env.NODE_ENV === "production" && !isAdminConfigured()) {
+    return NextResponse.json(
+      { error: "Admin authentication is not configured." },
+      { status: 503 }
+    );
+  }
+
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
   if (!rateLimit(`login:${ip}`, 8, 15 * 60 * 1000)) {
-    await log("security", "admin_login_rate_limited", { ip });
+    await log("security", "admin_login_rate_limited");
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }
 
@@ -26,7 +33,7 @@ export async function POST(req: Request) {
   const ok = password.length === expected.length && timingSafeEqual(a, b);
 
   if (!ok) {
-    await log("security", "admin_login_failed", { ip });
+    await log("security", "admin_login_failed");
     return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
   }
 
@@ -39,7 +46,7 @@ export async function POST(req: Request) {
     maxAge: MAX_AGE,
     path: "/",
   });
-  await log("security", "admin_login_success", { ip });
+  await log("security", "admin_login_success");
   return res;
 }
 

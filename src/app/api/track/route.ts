@@ -4,6 +4,16 @@ import { rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
+function externalOrigin(value: unknown) {
+  if (typeof value !== "string") return undefined;
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.origin : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const ip =
@@ -23,7 +33,7 @@ export async function POST(req: Request) {
       type,
       name: typeof body.name === "string" ? body.name.slice(0, 120) : undefined,
       path,
-      referrer: typeof body.referrer === "string" ? body.referrer.slice(0, 400) : undefined,
+      referrer: externalOrigin(body.referrer),
       meta:
         body.meta && typeof body.meta === "object"
           ? (body.meta as Record<string, unknown>)

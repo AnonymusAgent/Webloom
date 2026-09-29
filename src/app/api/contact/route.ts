@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
     if (!rateLimit(`contact:${ip}`, 6, 60 * 60 * 1000)) {
-      await log("warn", "contact_rate_limited", { ip });
+      await log("warn", "contact_rate_limited");
       return NextResponse.json(
         { error: "Too many submissions. Please try again later or email us directly." },
         { status: 429 }

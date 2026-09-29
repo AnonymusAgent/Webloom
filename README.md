@@ -34,7 +34,8 @@ The application includes a public marketing website, interactive pricing and pro
 20. [Production deployment](#production-deployment)
 21. [Backups and operations](#backups-and-operations)
 22. [Known boundaries and production recommendations](#known-boundaries-and-production-recommendations)
-23. [Troubleshooting](#troubleshooting)
+23. [Full Website Audit & Enhancement Roadmap](#full-website-audit--enhancement-roadmap)
+24. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -1061,6 +1062,121 @@ Recommended next integrations, when needed:
 - GitHub webhook refresh with signature verification
 - Content Security Policy
 - Data retention automation
+
+---
+
+## Full Website Audit & Enhancement Roadmap
+
+This audit records the repository and local application state reviewed on 2026-09-29. **Implemented** means present in source or confirmed locally; **Partially implemented** means the foundation exists but a user or operational step remains; **Recommended** is future work, not a current feature. No live production URL was supplied, so live-domain behavior, Lighthouse/Core Web Vitals, real-device rendering, and legal compliance were not independently verified.
+
+### Verification performed
+
+- Inspected public route files, homepage sections, navigation, footer, forms, data access, API handlers, metadata, sitemap, robots, authentication, and deployment configuration.
+- Local HTTP checks: `/`, `/services`, `/work`, `/pricing`, `/about`, `/contact`, `/blog`, all three legal routes, `/admin`, `/api/health`, `/sitemap.xml`, and `/robots.txt` returned `200`; an unknown route returned the branded `404`. The health endpoint reported Neon as up. Two published article URLs appeared in the sitemap.
+- Checked horizontal overflow on the 11 primary page routes at 390, 768, 1024, 1440, and 1920 CSS pixels. No horizontal overflow was observed. This is a width check, not a full visual, device, or assistive-technology certification.
+- Exercised empty contact-form validation. Required name, email, and project-description fields expose `aria-invalid` and their associated error text. TypeScript validation passed after audit fixes.
+- The browser console showed a deprecated `THREE.Clock` warning and font-preload warnings. These are follow-up maintenance/performance items, not observed route failures.
+
+### Existing page and route inventory
+
+| Route | Purpose and what works | Gaps and recommended improvements |
+|---|---|---|
+| `/` | Hero and dual CTAs; capability/process strip; services; product carousel; Why Webloom; verified GitHub project preview; concepts; process; technology; pricing; existing-product improvement; conditional testimonials/insights; FAQ; final CTA. | Strong journey to Work, Pricing, and Contact. Capability labels are not independent trust evidence. Clarify target buyer and concrete business problems near the hero. Add permissioned case studies, real quotes, or product demos when available; never invent results. Reconcile estimator assumptions with package prices. |
+| `/services` | One hub with six anchored services: websites, mobile apps, custom software, SaaS, AI products, UI/UX. Each has a summary, included capabilities, contact CTA, and pricing link; technology, improvement, and final CTA follow. | Feature lists do not yet explain buyer fit, deliverables, dependencies, timeline ranges, proof, FAQs, support terms, or related services. Add these to the hub or create service routes only when content is distinct and substantive enough to justify them. |
+| `/work` | Source-verified GitHub projects are separated from labeled Webloom products and product concepts; cards describe features/technologies and offer a contact CTA. | No individual case-study routes or client outcomes. Add `/work/[slug]` only with verified problem, context, shipped scope, screenshots, engineering decisions, and permissioned outcomes. Label concept “outcomes” as intended product outcomes, not measured client results. |
+| `/pricing` | Website, app, custom-software, and SaaS tabs; starting-price tiers; directional estimator; combined-project CTA; FAQs. Tabs support keyboard navigation and hash activation. | Clarify currency/market, revisions and scope limits, exclusions, content entry, hosting/domain, third-party fees/taxes, app-store accounts, handoff, warranty, and maintenance duration. Estimator inputs are not mapped to tier inclusions; explain this distinction and validate ranges against actual quoting practice. |
+| `/about` | Product philosophy, mission/vision/approach/values, process, principles, and CTA. | No verifiable team profiles, location, company history, or delivery ownership. Add real details only when confirmed. Removed the stale claim that team/company details were admin-managed because no such admin feature exists. |
+| `/contact` | Context-prefilled brief, public contact address, next-step explanation, and form for name, company, email, phone, project type, budget, timeline, and description. Client/server validation, loading/error/success states, rate limiting, and Neon lead storage are implemented. | No existing product URL, preferred contact method, or multi-service selection. Add only if useful to qualification. Leads are stored but not emailed, so the “usually within one business day” expectation depends on someone monitoring Admin → Leads. Add notifications before promising an operational SLA. Consider a honeypot if spam becomes material. |
+| `/blog` | Published-post list, search, category filters, featured markers, dates, and deliberate empty/no-results states. | Keep categories tied to real content; add pagination only when volume warrants it and avoid thin SEO filler. |
+| `/blog/[slug]` | Published article route with metadata, Article JSON-LD, markdown-lite headings/lists/quotes, related reading, and not-found behavior for missing/unpublished articles. | Add author/editor, updated date, reading time, share controls, and a contextual project CTA. Add a table of contents only for long articles. If formatting needs grow, use a maintained Markdown renderer and keep HTML sanitized. |
+| `/legal/privacy`, `/legal/terms`, `/legal/cookies` | Static legal-template pages with headings and introductory disclaimers. | They are explicitly starting templates, not launch-ready legal documents. Have a qualified reviewer tailor them to the actual entity, jurisdiction, processors (including host/database), retention, user rights, analytics, and storage behavior. Removed the auto-generated “Last updated” date because build time did not prove review. |
+| `/admin` | No-index admin for overview, leads, GitHub projects, posts, testimonials, FAQs, activity, and settings; signed session cookie protects admin APIs. | Production auth now fails closed if either admin secret is absent rather than silently using development credentials. Configure unique production values and verify unauthorized endpoints return `401`. Later consider MFA/multi-user access, audit attribution, exports/backups, and shared rate limiting. |
+| Unknown route | Branded 404 with homepage recovery CTA. | Consider Work/Services links for visitors landing on stale content URLs. |
+| Global render error | Retry and homepage recovery controls, with digest when available. | Add centralized production error monitoring; console logging alone is not operational alerting. Keep exception detail private. |
+| Route loading | CSS-based branded loader. | Confirm reduced-motion and perceived-wait behavior on slower devices; use explicit feedback for long operations. |
+| `/sitemap.xml`, `/robots.txt` | Generated routes and published-article sitemap; admin/API disallowed from crawling. | Both returned `200` locally. Production must set `NEXT_PUBLIC_SITE_URL`; code now fails instead of emitting localhost metadata when it is absent. `robots.txt` is not access control. |
+| `/api/health` | Application/database health response; local check returned `200` with Neon up. | Add external uptime monitoring and alerting; keep internals out of public errors. |
+| `/api/contact`, `/api/track`, `/api/site-settings` | Lead submission, first-party analytics, and public-only settings endpoints. | Lead validation/persistence are implemented. Analytics now stores validated referrer origins instead of full URLs. Rate limits remain process-local and depend on a sanitized `x-forwarded-for` from the hosting edge. No email service or consent system is integrated; assess legal requirements against actual jurisdictions and analytics use. |
+| `/api/admin/*` | Session, leads, stats, CMS content/settings, and GitHub-management endpoints. | Regression-test auth and payload validation for every mutation. Single-admin auth and process-local rate limits do not provide multi-user governance or a shared global ceiling. |
+
+### Information architecture and positioning
+
+- **Implemented:** Primary navigation exposes Home, Services, Work, Pricing, About, and Contact. The footer adds Blog, FAQ (anchored on Pricing), and legal routes. Service anchors and contextual links lead to Contact. A separate `/start` route is unnecessary because `/contact` already fills that role.
+- **Clear:** The offer includes websites, mobile apps, SaaS, custom software, AI, UI/UX, product strategy/process, and existing-product improvement.
+- **Still broad:** Ideal customer, region, decision-maker, minimum engagement, and evidence-backed differentiator are not defined. Confirm these with the business owner before sharpening Home, Services, About, and Pricing copy.
+- **Trust:** Repository/source evidence and honest concept labels help. Independent reviews, real outcomes, team identity, certifications, and verifiable delivery commitments are absent or conditional. Do not fabricate them.
+- **Navigation:** Six primary links are reasonable. Keep Blog/FAQ in the footer unless analytics or user testing shows they deserve a primary slot. The mobile dialog handles Escape but should contain focus and restore it to the trigger on close.
+
+### Missing-page inventory
+
+These are recommendations, not current routes. Add them only when supported by real content:
+
+| Candidate | Recommendation |
+|---|---|
+| `/work/[slug]` case studies | Highest-value future page type when actual project context, shipped scope, images, and verified outcomes can be documented. Gives Work cards a meaningful deeper destination. |
+| `/services/[slug]` | Optional. Create only when each service has unique audience, scope, process, timeline, FAQs, and proof; avoid thin copies of the existing hub. |
+| Product detail routes | Add only for products genuinely available or with an approved public roadmap; show real status, screenshots, audience, and support path. |
+| Maintenance/support | A separate route is justified only after support scope, response windows, exclusions, and price are defined. Until then, clarify existing Pricing claims. |
+| Careers | Not warranted unless hiring and real role details are confirmed. |
+| Standalone FAQ, Process, or Technology | Not needed now: FAQs are on Home/Pricing, and Process/Technology appear on Home/About. Avoid duplicate pages. |
+| Testimonials/results | Keep hidden until genuine, permissioned content exists; no page is needed until there is sufficient evidence. |
+
+### Cross-site findings
+
+- **UX/conversion:** Context-prefilled service, plan, estimator, and product links make the contact path useful. Clarify buyer/differentiator sooner, add evidence and contextual article CTAs, and establish lead ownership.
+- **UI/responsive:** Visual language is consistent, and the tested routes did not overflow at five viewport widths. Fine overlap, touch-target size, color contrast, 200% zoom, translation stress, and real mobile browser rendering were not certified.
+- **Content:** Concepts and verified projects are labeled; false testimonials are suppressed. Clarify pricing exclusions, support commitments, scope, currency, and actual audience. Keep response-time copy only if leads are actively monitored.
+- **SEO:** Per-route metadata, canonicals, Open Graph/Twitter, Organization/ProfessionalService/Article/FAQ JSON-LD, sitemap, and robots exist. Set the production origin; add truthful author/date/image data where available; check actual search intent and content depth. Sitemap should include only published posts.
+- **Accessibility:** Semantic landmarks, skip link, labels, focus styling, reduced motion, keyboard pricing tabs, and linked form errors exist. Complete mobile-dialog focus trapping/restoration and `aria-controls` relationships for tabs. Run axe, contrast, keyboard-only, and screen-reader tests; source review is not certification.
+- **Performance:** Server Components, client-only 3D fallback, `next/image`, cached public reads, ISR, and reduced-motion branches exist. Measure field Web Vitals/bundles on production; review observed font-preload and deprecated `THREE.Clock` warnings before changing behavior. No Lighthouse score was collected.
+- **Security/privacy:** Parameterized Drizzle, HTTP-only signed admin cookie, validation, headers, and rate limits exist. This audit makes production admin auth fail closed, removes IPs from persisted rate-limit logs, and normalizes analytics referrers to origins. Remaining: sanitize proxy headers, use shared rate limiting at scale, add CSP when origins are known, review retention/legal obligations, and rotate credentials exposed outside a secret manager.
+- **Operations:** Leads persist but do not trigger email. Add notifications/monitoring and test restore procedures before relying on response SLAs. Add reviewed, versioned Drizzle migrations before frequent production schema changes.
+
+### Changes made during this audit
+
+- `src/lib/auth.ts`, `src/app/api/admin/session/route.ts`: production login refuses missing admin configuration; development fallback remains development-only.
+- `src/app/api/admin/session/route.ts`, `src/app/api/contact/route.ts`: rate-limit/security logs no longer persist request IP addresses.
+- `src/app/api/track/route.ts`, `src/components/chrome.tsx`: collect/store only valid external HTTP(S) origins, not full referrer paths or query strings.
+- `src/lib/site.ts`: production requires `NEXT_PUBLIC_SITE_URL` to avoid accidental localhost canonical/metadata output.
+- `src/components/contact-form.tsx`: required fields expose required state and associate validation errors with controls.
+- `src/app/about/page.tsx`: removed an inaccurate claim that team/company details are managed in Admin.
+- `src/app/legal/[doc]/page.tsx`: removed a generated legal “Last updated” date that reflected build time rather than review.
+
+### Priority roadmap
+
+#### Phase 1 — Critical fixes
+
+1. Set and verify production `DATABASE_URL`, strong `ADMIN_PASSWORD`, independent `ADMIN_SECRET`, and final HTTPS `NEXT_PUBLIC_SITE_URL` in Vercel; rotate any credential disclosed outside a secret manager. This prevents insecure access and incorrect SEO URLs.
+2. Have Privacy, Terms, and Cookie templates reviewed against the actual business entity, jurisdiction, data processors, retention, and analytics/storage practices.
+3. Establish lead ownership and email/equivalent delivery before advertising a response-time commitment; leads currently persist but do not trigger email.
+4. Confirm the production edge sanitizes `x-forwarded-for`; otherwise rate-limit identity can be spoofed.
+
+#### Phase 2 — Core UX/content improvements
+
+1. Confirm target buyer, region, problems, differentiators, and minimum engagement; align Home, Services, About, and FAQ copy.
+2. Add Pricing exclusions, revision/scope boundaries, recurring charges, deliverables, handoff, maintenance/support duration, and currency. Validate estimator ranges against actual quoting practice.
+3. Add service-specific buyer fit, deliverables, timeline ranges, dependencies, FAQs, proof, and related links. Add contact fields only when the lead workflow can use them.
+4. Add author/update/reading context and a project CTA to articles; avoid thin SEO filler.
+
+#### Phase 3 — New pages and functionality
+
+1. Build case studies and link them from Work only when verified project evidence is available.
+2. Add service/product detail routes only for distinct content and established offers; otherwise retain the current hubs.
+3. Add lead notifications, export/retention controls, and shared rate limiting if traffic/staffing outgrows the process-local setup.
+4. Add a Maintenance/Support page only after scope, service windows, and commercial terms exist.
+
+#### Phase 4 — SEO, performance, and accessibility
+
+1. Run Lighthouse/Web Vitals, real mobile/tablet/browser checks, axe, keyboard-only, screen-reader, contrast, and 200% zoom tests on the deployed domain.
+2. Contain/restore focus in the mobile dialog and complete pricing-tab relationships; verify focus order and reduced-motion behavior.
+3. Review font preloads and Three.js warnings; measure before changing loading strategy or removing 3D.
+4. Validate production canonicals, sitemap, structured data, alt text, robots, and security headers after setting the production origin.
+
+#### Phase 5 — Premium polish and advanced enhancements
+
+1. Add case-study visuals, real product demos, and permissioned trust signals without invented metrics.
+2. Add CMS media management and richer article formatting only when editorial volume warrants them.
+3. Add multi-user admin, 2FA, audit attribution, webhooks, CSP, distributed abuse controls, and automated retention as the business grows.
 
 ---
 

@@ -24,12 +24,17 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+if (process.env.NODE_ENV === "production" && !siteUrl) {
+  throw new Error("NEXT_PUBLIC_SITE_URL must be configured in production.");
+}
+
 export const SITE = {
   name: "Webloom",
   tagline: "Digital products, built beautifully.",
   positioning: "We build digital products that make businesses grow.",
   email: "webloomofficial@gmail.com",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  url: siteUrl || "http://localhost:3000",
   description:
     "Webloom is a premium software and digital product company. We design and engineer websites, mobile apps, SaaS platforms and custom business software — beautifully.",
 };

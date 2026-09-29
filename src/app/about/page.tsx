@@ -166,12 +166,6 @@ export default function AboutPage() {
               </ul>
             </div>
           </Reveal>
-          <Reveal delay={0.1}>
-            <p className="mt-10 text-center text-sm text-mut">
-              Team profiles and company details are managed from the Webloom admin — this page
-              stays honest, never fabricated.
-            </p>
-          </Reveal>
         </Container>
       </section>
 

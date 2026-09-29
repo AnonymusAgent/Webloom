@@ -21,11 +21,13 @@ const inputCls =
 function Field({
   label,
   error,
+  errorId,
   required,
   children,
 }: {
   label: string;
   error?: string;
+  errorId?: string;
   required?: boolean;
   children: ReactNode;
 }) {
@@ -36,7 +38,7 @@ function Field({
           {label}
           {required && <span className="ml-1 text-brand">*</span>}
         </span>
-        {error && <span className="text-[0.7rem] text-red-400">{error}</span>}
+        {error && <span id={errorId} className="text-[0.7rem] text-red-400">{error}</span>}
       </span>
       {children}
     </label>
@@ -152,13 +154,16 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
       aria-label="Project brief form"
     >
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Name" required error={errors.name}>
+        <Field label="Name" required error={errors.name} errorId="name-error">
           <input
+            required
             value={form.name}
             onChange={(e) => set("name", e.target.value)}
             className={cn(inputCls, errors.name && "border-red-400/60")}
             placeholder="Your name"
             autoComplete="name"
+            aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? "name-error" : undefined}
             maxLength={120}
           />
         </Field>
@@ -175,14 +180,17 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Email" required error={errors.email}>
+        <Field label="Email" required error={errors.email} errorId="email-error">
           <input
+            required
             type="email"
             value={form.email}
             onChange={(e) => set("email", e.target.value)}
             className={cn(inputCls, errors.email && "border-red-400/60")}
             placeholder="you@company.com"
             autoComplete="email"
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? "email-error" : undefined}
             maxLength={160}
           />
         </Field>
@@ -205,9 +213,14 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
             Project type
             <span className="ml-1 text-brand">*</span>
           </span>
-          {errors.projectType && <span className="text-[0.7rem] text-red-400">{errors.projectType}</span>}
+          {errors.projectType && <span id="project-type-error" className="text-[0.7rem] text-red-400">{errors.projectType}</span>}
         </span>
-        <div className="flex flex-wrap gap-2" role="group" aria-labelledby="wl-pt-label">
+        <div
+          className="flex flex-wrap gap-2"
+          role="group"
+          aria-labelledby="wl-pt-label"
+          aria-describedby={errors.projectType ? "project-type-error" : undefined}
+        >
           {PROJECT_TYPES.map((t) => (
             <button
               key={t}
@@ -264,11 +277,14 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
         </Field>
       </div>
 
-      <Field label="Project description" required error={errors.message}>
+      <Field label="Project description" required error={errors.message} errorId="message-error">
         <textarea
+          required
           value={form.message}
           onChange={(e) => set("message", e.target.value)}
           rows={5}
+          aria-invalid={Boolean(errors.message)}
+          aria-describedby={errors.message ? "message-error" : undefined}
           className={cn(inputCls, "resize-none", errors.message && "border-red-400/60")}
           placeholder="What are you building? Who is it for? What should it do?"
           maxLength={4000}

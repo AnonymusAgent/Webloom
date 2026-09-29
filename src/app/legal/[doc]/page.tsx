@@ -62,11 +62,6 @@ export default async function LegalPage({
               </Reveal>
             ))}
           </div>
-          <Reveal delay={0.1}>
-            <p className="mt-10 text-center text-[0.72rem] text-mut">
-              Last updated: {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-            </p>
-          </Reveal>
         </div>
       </Container>
     </section>
