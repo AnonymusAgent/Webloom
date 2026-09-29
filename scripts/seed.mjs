@@ -26,7 +26,7 @@ if (!databaseUrl) {
 const SETTINGS = [
   {
     key: "contactEmail",
-    value: JSON.stringify("hello@webloom.dev"),
+    value: JSON.stringify("webloomofficial@gmail.com"),
   },
   {
     key: "socials",

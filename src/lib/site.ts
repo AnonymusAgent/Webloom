@@ -28,7 +28,7 @@ export const SITE = {
   name: "Webloom",
   tagline: "Digital products, built beautifully.",
   positioning: "We build digital products that make businesses grow.",
-  email: "hello@webloom.dev",
+  email: "webloomofficial@gmail.com",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   description:
     "Webloom is a premium software and digital product company. We design and engineer websites, mobile apps, SaaS platforms and custom business software — beautifully.",
