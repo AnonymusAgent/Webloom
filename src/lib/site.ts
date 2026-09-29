@@ -794,6 +794,8 @@ export const TIMELINES = ["ASAP", "1–2 months", "3–6 months", "Flexible"];
 
 export const LEAD_STATUSES = [
   { id: "new", label: "New" },
+  { id: "accepted", label: "Accepted" },
+  { id: "rejected", label: "Rejected" },
   { id: "contacted", label: "Contacted" },
   { id: "qualified", label: "Qualified" },
   { id: "proposal", label: "Proposal Sent" },

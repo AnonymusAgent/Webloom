@@ -225,6 +225,8 @@ function Overview({ stats }: { stats: Stats | null }) {
 
 const STATUS_COLORS: Record<string, string> = {
   new: "border-brand/40 bg-brand/10 text-brand",
+  accepted: "border-emerald-400/30 bg-emerald-400/10 text-emerald-400",
+  rejected: "border-red-400/30 bg-red-400/10 text-red-400",
   contacted: "border-sky-400/30 bg-sky-400/10 text-sky-400",
   qualified: "border-violet-400/30 bg-violet-400/10 text-violet-400",
   proposal: "border-amber-400/30 bg-amber-400/10 text-amber-400",
@@ -235,6 +237,8 @@ const STATUS_COLORS: Record<string, string> = {
 function LeadsPanel() {
   const [items, setItems] = useState<Lead[] | null>(null);
   const [filter, setFilter] = useState("all");
+  const [saving, setSaving] = useState<Record<string, boolean>>({});
+  const [messages, setMessages] = useState<Record<string, { text: string; error: boolean }>>({});
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/leads");
@@ -250,12 +254,28 @@ function LeadsPanel() {
   }, [load]);
 
   async function setStatus(id: string, status: string) {
-    setItems((cur) => cur?.map((l) => (l.id === id ? { ...l, status } : l)) ?? null);
-    await fetch("/api/admin/leads", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
+    if (saving[id]) return;
+    setSaving((current) => ({ ...current, [id]: true }));
+    setMessages((current) => ({ ...current, [id]: { text: "", error: false } }));
+    try {
+      const response = await fetch("/api/admin/leads", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Could not update lead status.");
+      setItems((current) => current?.map((lead) => (lead.id === id ? { ...lead, status } : lead)) ?? null);
+      setMessages((current) => ({ ...current, [id]: { text: data.message, error: !data.notificationSent && ["failed", "skipped"].includes(data.notificationStatus) } }));
+    } catch (error) {
+      setMessages((current) => ({
+        ...current,
+        [id]: { text: error instanceof Error ? error.message : "Could not update lead status.", error: true },
+      }));
+      await load().catch(() => {});
+    } finally {
+      setSaving((current) => ({ ...current, [id]: false }));
+    }
   }
 
   if (!items) return <p className="py-10 text-center text-sm text-mut">Loading…</p>;
@@ -304,6 +324,7 @@ function LeadsPanel() {
               <select
                 value={l.status}
                 onChange={(e) => setStatus(l.id, e.target.value)}
+                disabled={saving[l.id]}
                 aria-label="Lead status"
                 className={`rounded-full border px-3 py-1.5 text-[0.72rem] font-medium outline-none ${STATUS_COLORS[l.status] ?? ""}`}
               >
@@ -314,6 +335,28 @@ function LeadsPanel() {
                 ))}
               </select>
             </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <AdButton
+                onClick={() => setStatus(l.id, "accepted")}
+                disabled={saving[l.id] || l.status === "accepted"}
+              >
+                {saving[l.id] ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                Accept Project
+              </AdButton>
+              <AdButton
+                onClick={() => setStatus(l.id, "rejected")}
+                variant="danger"
+                disabled={saving[l.id] || l.status === "rejected"}
+              >
+                {saving[l.id] ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                Reject Project
+              </AdButton>
+            </div>
+            {messages[l.id]?.text && (
+              <p role={messages[l.id].error ? "alert" : "status"} className={`mt-3 text-xs ${messages[l.id].error ? "text-amber-400" : "text-mut"}`}>
+                {messages[l.id].text}
+              </p>
+            )}
             <div className="mt-3 flex flex-wrap gap-1.5">
               <span className="rounded-full border border-line px-2.5 py-1 text-[0.68rem] text-mut">{l.projectType}</span>
               {l.budget && (

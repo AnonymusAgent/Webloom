@@ -65,7 +65,7 @@ The application includes a public marketing website, interactive pricing and pro
 - Context-aware contact links that prefill the project brief
 - Contact form validation, loading, success, and error states
 - PostgreSQL-backed lead storage
-- Lead status pipeline in the admin dashboard
+- Admin lead status pipeline with accepted/rejected decision emails via Resend
 
 ### Administration
 
@@ -73,6 +73,7 @@ The application includes a public marketing website, interactive pricing and pro
 - 30-day page-view, interaction, lead, and conversion summaries
 - Popular pages, external referrers, daily traffic chart, and lead status totals
 - Lead review and status updates
+- Accept/reject actions with customer email notification status
 - Verified GitHub repository inspection, review, refresh, and publication controls
 - Blog post create, edit, publish, feature, and delete controls
 - Testimonial create, edit, publish/hide, and delete controls
@@ -94,6 +95,7 @@ The application includes a public marketing website, interactive pricing and pro
 | Icons | Lucide React plus custom SVG brand marks |
 | Database | PostgreSQL |
 | ORM | Drizzle ORM with `node-postgres` |
+| Transactional email | Resend for admin lead decisions |
 | Schema tooling | Drizzle Kit |
 | Class utilities | `clsx` and `tailwind-merge` |
 | Fonts | Inter and JetBrains Mono via `next/font` |
@@ -296,6 +298,10 @@ cp .env.example .env
 DATABASE_URL=postgresql://USER:PASSWORD@DIRECT_HOST/DATABASE?sslmode=require&channel_binding=require
 ADMIN_PASSWORD=replace-with-a-long-unique-password
 ADMIN_SECRET=replace-with-a-separate-random-signing-secret
+# Transactional email for accepted/rejected project decisions (Resend)
+EMAIL_API_KEY=re_your_resend_api_key
+EMAIL_FROM=Webloom <notifications@your-verified-domain.example>
+EMAIL_REPLY_TO=webloomofficial@gmail.com
 # Optional: enables connected-account discovery and private-repository inspection
 GITHUB_TOKEN=github_pat_read_only_token
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
@@ -306,6 +312,9 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 | `DATABASE_URL` | Yes | Server only | PostgreSQL connection used by the application |
 | `ADMIN_PASSWORD` | Production: yes | Server only | Password accepted by `/admin` |
 | `ADMIN_SECRET` | Production: yes | Server only | HMAC key used to sign admin session tokens |
+| `EMAIL_API_KEY` | For email notifications | Server only | Resend API key used for accepted/rejected lead messages |
+| `EMAIL_FROM` | For email notifications | Server only | Sender identity verified with Resend |
+| `EMAIL_REPLY_TO` | Optional | Server only | Customer reply destination; defaults to `SITE.email` |
 | `GITHUB_TOKEN` | Optional | Server only | Enables `/user/repos` discovery and inspection of authorized private repositories |
 | `NEXT_PUBLIC_SITE_URL` | Production: yes | Public | Absolute canonical origin used by metadata, Open Graph, sitemap, and robots |
 
@@ -314,6 +323,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 - Development falls back to admin password `webloom` and signing secret `webloom-dev-secret`. **Never rely on these defaults in production.**
 - Use separate, long values for `ADMIN_PASSWORD` and `ADMIN_SECRET`.
 - Changing `ADMIN_SECRET` invalidates existing admin sessions.
+- Configure `EMAIL_API_KEY` and a Resend-verified `EMAIL_FROM` in local `.env` and the Vercel environments where lead decisions will be made. Email keys are used only by the server-side mailer.
 - `NEXT_PUBLIC_SITE_URL` must be the final public origin, for example `https://webloom.example`. If it is omitted, generated SEO URLs fall back to `http://localhost:3000`.
 - A token is not required to import public repositories by exact URL. Connected-account discovery and private repository inspection require `GITHUB_TOKEN`.
 - Prefer a fine-grained, read-only token restricted to the repositories Webloom may inspect. Repository **Metadata: read** is sufficient for discovery; **Contents: read** is needed for README, tree, language, and manifest analysis.
@@ -433,10 +443,10 @@ The canonical schema is `src/db/schema.ts`. The application contains eight table
 The supported workflow is defined in `src/lib/site.ts`:
 
 ```text
-new → contacted → qualified → proposal → won / lost
+new → contacted → qualified → proposal → accepted / rejected → won / lost
 ```
 
-The stored value for “Proposal Sent” is `proposal`.
+`accepted` and `rejected` are decision statuses. The status column is text, so adding them does not require a database migration. A customer email is sent only on a real transition into either decision status; repeating the same status does not send another email.
 
 ### Apply schema changes
 
@@ -499,6 +509,7 @@ Shows the last 30 days of:
 - Displays contact information, project type, budget, timeline, and message
 - Filters by status
 - Updates status without leaving the page
+- Accepts or rejects a project with per-lead loading state and explicit email-delivery feedback
 
 #### GitHub Work
 
@@ -680,9 +691,11 @@ Server-side validation is performed in `src/app/api/contact/route.ts`; client-si
 6. A `lead_created` activity record is written.
 7. The admin dashboard can review and progress the lead.
 
-### Email delivery
+### Decision email delivery
 
-The current implementation **stores leads in PostgreSQL but does not send an email notification**. The contact email shown on the site is a clickable `mailto:` address. If email alerts are required, integrate a transactional email provider inside the server-side contact route and keep its credentials in server-only environment variables.
+New submissions are stored without an automatic receipt email. In Admin → Leads, **Accept Project** or **Reject Project** changes the lead status to `accepted` or `rejected` and sends a branded customer email through Resend. The email includes the customer name, project type, short reference, status, and a decision-specific message; no rejection reason is invented.
+
+The authenticated `PATCH /api/admin/leads` route updates only when the requested status differs from the stored status. This conditional database update is the idempotency guard: repeated requests for the same status do not send duplicate messages. If Resend is not configured, the recipient address is invalid, or delivery fails, the status remains updated, the failure is logged without credentials or email body, and Admin reports that no notification was sent. Configure `EMAIL_API_KEY` and a Resend-verified `EMAIL_FROM` before using these actions in production.
 
 ### Contact-link prefills
 
@@ -934,6 +947,9 @@ The health route returns HTTP `503` when the database query fails.
 - [ ] Required field validation is understandable
 - [ ] Successful submission appears in Admin → Leads
 - [ ] Invalid payloads return 400 and excessive requests return 429
+- [ ] Accepting/rejecting a lead sends one customer email for the transition
+- [ ] Repeating the same decision sends no duplicate email
+- [ ] Missing Resend configuration/provider failure leaves status updated and shows a notification warning
 
 #### Admin
 
@@ -975,11 +991,12 @@ Before starting the application in a new environment, apply the database schema 
 2. Set `DATABASE_URL`.
 3. Set a strong `ADMIN_PASSWORD`.
 4. Set an independent random `ADMIN_SECRET`.
-5. Optionally set a read-only `GITHUB_TOKEN` for connected discovery/private repository inspection.
-6. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin.
-7. Apply the database schema.
-8. Build and deploy.
-9. Verify `/api/health`, `/sitemap.xml`, an article route, the contact flow, GitHub import/review, and `/admin`.
+5. Set `EMAIL_API_KEY` and a Resend-verified `EMAIL_FROM` to enable decision emails.
+6. Optionally set a read-only `GITHUB_TOKEN` for connected discovery/private repository inspection.
+7. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin.
+8. Apply the database schema.
+9. Build and deploy.
+10. Verify `/api/health`, `/sitemap.xml`, an article route, contact submission, accept/reject email delivery, GitHub import/review, and `/admin`.
 
 ### Reverse proxies
 
@@ -1040,7 +1057,7 @@ Test restore procedures in a non-production environment before relying on them.
 The current implementation is complete and functional, but these boundaries should be understood before a larger-scale launch:
 
 1. **Hybrid CMS:** services, portfolio/product concepts, pricing, hero, About copy, process, technology, and legal templates are not editable from `/admin`; they live in `src/lib/site.ts`.
-2. **No email notifications:** contact submissions are stored in PostgreSQL. No transactional email provider is configured.
+2. **No submission receipt email:** new briefs are stored in PostgreSQL without an automatic acknowledgement. Resend emails are sent after an admin accepts/rejects a lead when `EMAIL_API_KEY` and `EMAIL_FROM` are configured.
 3. **Single-admin authentication:** there are no user accounts, roles, password reset flow, or 2FA.
 4. **Process-local rate limiting:** suitable as a basic single-instance control, not distributed infrastructure.
 5. **No media upload system:** blog and testimonial admin forms do not upload images or files.
@@ -1086,7 +1103,7 @@ This audit records the repository and local application state reviewed on 2026-0
 | `/work` | Source-verified GitHub projects are separated from labeled Webloom products and product concepts; cards describe features/technologies and offer a contact CTA. | No individual case-study routes or client outcomes. Add `/work/[slug]` only with verified problem, context, shipped scope, screenshots, engineering decisions, and permissioned outcomes. Label concept “outcomes” as intended product outcomes, not measured client results. |
 | `/pricing` | Website, app, custom-software, and SaaS tabs; starting-price tiers; directional estimator; combined-project CTA; FAQs. Tabs support keyboard navigation and hash activation. | Clarify currency/market, revisions and scope limits, exclusions, content entry, hosting/domain, third-party fees/taxes, app-store accounts, handoff, warranty, and maintenance duration. Estimator inputs are not mapped to tier inclusions; explain this distinction and validate ranges against actual quoting practice. |
 | `/about` | Product philosophy, mission/vision/approach/values, process, principles, and CTA. | No verifiable team profiles, location, company history, or delivery ownership. Add real details only when confirmed. Removed the stale claim that team/company details were admin-managed because no such admin feature exists. |
-| `/contact` | Context-prefilled brief, public contact address, next-step explanation, and form for name, company, email, phone, project type, budget, timeline, and description. Client/server validation, loading/error/success states, rate limiting, and Neon lead storage are implemented. | No existing product URL, preferred contact method, or multi-service selection. Add only if useful to qualification. Leads are stored but not emailed, so the “usually within one business day” expectation depends on someone monitoring Admin → Leads. Add notifications before promising an operational SLA. Consider a honeypot if spam becomes material. |
+| `/contact` | Context-prefilled brief, public contact address, next-step explanation, and form for name, company, email, phone, project type, budget, timeline, and description. Client/server validation, loading/error/success states, rate limiting, and Neon lead storage are implemented. | No submission receipt email, existing product URL, preferred contact method, or multi-service selection. Add fields only if useful to qualification. Decision emails are sent after admin acceptance/rejection; the “usually within one business day” expectation still depends on someone monitoring Admin → Leads. Consider a honeypot if spam becomes material. |
 | `/blog` | Published-post list, search, category filters, featured markers, dates, and deliberate empty/no-results states. | Keep categories tied to real content; add pagination only when volume warrants it and avoid thin SEO filler. |
 | `/blog/[slug]` | Published article route with metadata, Article JSON-LD, markdown-lite headings/lists/quotes, related reading, and not-found behavior for missing/unpublished articles. | Add author/editor, updated date, reading time, share controls, and a contextual project CTA. Add a table of contents only for long articles. If formatting needs grow, use a maintained Markdown renderer and keep HTML sanitized. |
 | `/legal/privacy`, `/legal/terms`, `/legal/cookies` | Static legal-template pages with headings and introductory disclaimers. | They are explicitly starting templates, not launch-ready legal documents. Have a qualified reviewer tailor them to the actual entity, jurisdiction, processors (including host/database), retention, user rights, analytics, and storage behavior. Removed the auto-generated “Last updated” date because build time did not prove review. |
@@ -1096,8 +1113,8 @@ This audit records the repository and local application state reviewed on 2026-0
 | Route loading | CSS-based branded loader. | Confirm reduced-motion and perceived-wait behavior on slower devices; use explicit feedback for long operations. |
 | `/sitemap.xml`, `/robots.txt` | Generated routes and published-article sitemap; admin/API disallowed from crawling. | Both returned `200` locally. Production must set `NEXT_PUBLIC_SITE_URL`; code now fails instead of emitting localhost metadata when it is absent. `robots.txt` is not access control. |
 | `/api/health` | Application/database health response; local check returned `200` with Neon up. | Add external uptime monitoring and alerting; keep internals out of public errors. |
-| `/api/contact`, `/api/track`, `/api/site-settings` | Lead submission, first-party analytics, and public-only settings endpoints. | Lead validation/persistence are implemented. Analytics now stores validated referrer origins instead of full URLs. Rate limits remain process-local and depend on a sanitized `x-forwarded-for` from the hosting edge. No email service or consent system is integrated; assess legal requirements against actual jurisdictions and analytics use. |
-| `/api/admin/*` | Session, leads, stats, CMS content/settings, and GitHub-management endpoints. | Regression-test auth and payload validation for every mutation. Single-admin auth and process-local rate limits do not provide multi-user governance or a shared global ceiling. |
+| `/api/contact`, `/api/track`, `/api/site-settings` | Lead submission, first-party analytics, and public-only settings endpoints. | Lead validation/persistence are implemented. There is no submission receipt email. Analytics stores validated referrer origins instead of full URLs. Rate limits remain process-local and depend on a sanitized `x-forwarded-for` from the hosting edge. No consent system is integrated; assess requirements against actual jurisdictions and analytics use. |
+| `/api/admin/*` | Session, leads, stats, CMS content/settings, and GitHub-management endpoints. | Accepted/rejected transitions atomically trigger one server-side Resend notification; unchanged statuses do not re-send. Email failures are logged and surfaced without rolling back status. Single-admin auth and process-local rate limits do not provide multi-user governance or a shared global ceiling. |
 
 ### Information architecture and positioning
 
@@ -1141,6 +1158,8 @@ These are recommendations, not current routes. Add them only when supported by r
 - `src/components/contact-form.tsx`: required fields expose required state and associate validation errors with controls.
 - `src/app/about/page.tsx`: removed an inaccurate claim that team/company details are managed in Admin.
 - `src/app/legal/[doc]/page.tsx`: removed a generated legal “Last updated” date that reflected build time rather than review.
+- `src/lib/lead-email.ts`, `src/app/api/admin/leads/route.ts`: added server-side Resend templates and authenticated, idempotent decision notifications; no schema migration was needed because `leads.status` is text.
+- `src/components/admin/admin-app.tsx`, `src/lib/site.ts`: added Accept/Reject actions, loading/delivery feedback, and `accepted`/`rejected` status values.
 
 ### Priority roadmap
 
@@ -1148,7 +1167,7 @@ These are recommendations, not current routes. Add them only when supported by r
 
 1. Set and verify production `DATABASE_URL`, strong `ADMIN_PASSWORD`, independent `ADMIN_SECRET`, and final HTTPS `NEXT_PUBLIC_SITE_URL` in Vercel; rotate any credential disclosed outside a secret manager. This prevents insecure access and incorrect SEO URLs.
 2. Have Privacy, Terms, and Cookie templates reviewed against the actual business entity, jurisdiction, data processors, retention, and analytics/storage practices.
-3. Establish lead ownership and email/equivalent delivery before advertising a response-time commitment; leads currently persist but do not trigger email.
+3. Configure Resend and establish lead ownership. Decision emails are supported, but new submissions do not receive an automatic acknowledgement; response-time commitments still depend on someone monitoring leads.
 4. Confirm the production edge sanitizes `x-forwarded-for`; otherwise rate-limit identity can be spoofed.
 
 #### Phase 2 — Core UX/content improvements
@@ -1162,7 +1181,7 @@ These are recommendations, not current routes. Add them only when supported by r
 
 1. Build case studies and link them from Work only when verified project evidence is available.
 2. Add service/product detail routes only for distinct content and established offers; otherwise retain the current hubs.
-3. Add lead notifications, export/retention controls, and shared rate limiting if traffic/staffing outgrows the process-local setup.
+3. Consider submission acknowledgements, export/retention controls, and shared rate limiting if workflow or traffic needs justify them.
 4. Add a Maintenance/Support page only after scope, service windows, and commercial terms exist.
 
 #### Phase 4 — SEO, performance, and accessibility
@@ -1240,9 +1259,9 @@ This is intentional when there are no genuine published entries. Add a real test
 
 The built-in FAQ set remains active until at least one published database FAQ exists. Publish custom FAQs to replace the fallback set.
 
-### Contact form succeeds but no email arrives
+### A new contact brief does not trigger an email
 
-That is expected in the current architecture. The submission is stored in Admin → Leads; email delivery is not integrated.
+That is expected: submission receipt emails are not sent. The brief is stored in Admin → Leads. After an administrator accepts or rejects it, Resend sends the decision email if `EMAIL_API_KEY` and a Resend-verified `EMAIL_FROM` are configured.
 
 ### GitHub import says the URL is not a repository
 
