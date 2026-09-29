@@ -65,7 +65,7 @@ The application includes a public marketing website, interactive pricing and pro
 - Context-aware contact links that prefill the project brief
 - Contact form validation, loading, success, and error states
 - PostgreSQL-backed lead storage
-- Admin lead status pipeline with accepted/rejected decision emails via Resend
+- Admin lead status pipeline with accepted/rejected decision emails via Brevo
 
 ### Administration
 
@@ -95,7 +95,7 @@ The application includes a public marketing website, interactive pricing and pro
 | Icons | Lucide React plus custom SVG brand marks |
 | Database | PostgreSQL |
 | ORM | Drizzle ORM with `node-postgres` |
-| Transactional email | Resend for admin lead decisions |
+| Transactional email | Brevo API for admin lead decisions |
 | Schema tooling | Drizzle Kit |
 | Class utilities | `clsx` and `tailwind-merge` |
 | Fonts | Inter and JetBrains Mono via `next/font` |
@@ -298,8 +298,8 @@ cp .env.example .env
 DATABASE_URL=postgresql://USER:PASSWORD@DIRECT_HOST/DATABASE?sslmode=require&channel_binding=require
 ADMIN_PASSWORD=replace-with-a-long-unique-password
 ADMIN_SECRET=replace-with-a-separate-random-signing-secret
-# Transactional email for accepted/rejected project decisions (Resend)
-EMAIL_API_KEY=re_your_resend_api_key
+# Transactional email for accepted/rejected project decisions (Brevo)
+BREVO_API_KEY=xkeysib-your-brevo-api-key
 EMAIL_FROM=Webloom <notifications@your-verified-domain.example>
 EMAIL_REPLY_TO=webloomofficial@gmail.com
 # Optional: enables connected-account discovery and private-repository inspection
@@ -312,8 +312,8 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 | `DATABASE_URL` | Yes | Server only | PostgreSQL connection used by the application |
 | `ADMIN_PASSWORD` | Production: yes | Server only | Password accepted by `/admin` |
 | `ADMIN_SECRET` | Production: yes | Server only | HMAC key used to sign admin session tokens |
-| `EMAIL_API_KEY` | For email notifications | Server only | Resend API key used for accepted/rejected lead messages |
-| `EMAIL_FROM` | For email notifications | Server only | Sender identity verified with Resend |
+| `BREVO_API_KEY` | For email notifications | Server only | Brevo API key used for accepted/rejected lead messages |
+| `EMAIL_FROM` | For email notifications | Server only | Sender identity verified with Brevo |
 | `EMAIL_REPLY_TO` | Optional | Server only | Customer reply destination; defaults to `SITE.email` |
 | `GITHUB_TOKEN` | Optional | Server only | Enables `/user/repos` discovery and inspection of authorized private repositories |
 | `NEXT_PUBLIC_SITE_URL` | Production: yes | Public | Absolute canonical origin used by metadata, Open Graph, sitemap, and robots |
@@ -323,7 +323,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 - Development falls back to admin password `webloom` and signing secret `webloom-dev-secret`. **Never rely on these defaults in production.**
 - Use separate, long values for `ADMIN_PASSWORD` and `ADMIN_SECRET`.
 - Changing `ADMIN_SECRET` invalidates existing admin sessions.
-- Configure `EMAIL_API_KEY` and a Resend-verified `EMAIL_FROM` in local `.env` and the Vercel environments where lead decisions will be made. Email keys are used only by the server-side mailer.
+- Create a Brevo API key under **Settings → SMTP & API → API Keys**. Configure `BREVO_API_KEY` and a verified `EMAIL_FROM` in local `.env` and Vercel. These credentials are used only by the server-side mailer. A Brevo account/API key is not the same as a Brevo Automation workflow.
 - `NEXT_PUBLIC_SITE_URL` must be the final public origin, for example `https://webloom.example`. If it is omitted, generated SEO URLs fall back to `http://localhost:3000`.
 - A token is not required to import public repositories by exact URL. Connected-account discovery and private repository inspection require `GITHUB_TOKEN`.
 - Prefer a fine-grained, read-only token restricted to the repositories Webloom may inspect. Repository **Metadata: read** is sufficient for discovery; **Contents: read** is needed for README, tree, language, and manifest analysis.
@@ -693,9 +693,9 @@ Server-side validation is performed in `src/app/api/contact/route.ts`; client-si
 
 ### Decision email delivery
 
-New submissions are stored without an automatic receipt email. In Admin → Leads, **Accept Project** or **Reject Project** changes the lead status to `accepted` or `rejected` and sends a branded customer email through Resend. The email includes the customer name, project type, short reference, status, and a decision-specific message; no rejection reason is invented.
+New submissions are stored without an automatic receipt email. In Admin → Leads, **Accept Project** or **Reject Project** changes the lead status to `accepted` or `rejected` and sends a branded customer email through the Brevo transactional email API. The email includes the customer name, project type, short reference, status, and a decision-specific message; no rejection reason is invented.
 
-The authenticated `PATCH /api/admin/leads` route updates only when the requested status differs from the stored status. This conditional database update is the idempotency guard: repeated requests for the same status do not send duplicate messages. If Resend is not configured, the recipient address is invalid, or delivery fails, the status remains updated, the failure is logged without credentials or email body, and Admin reports that no notification was sent. Configure `EMAIL_API_KEY` and a Resend-verified `EMAIL_FROM` before using these actions in production.
+The authenticated `PATCH /api/admin/leads` route updates only when the requested status differs from the stored status. This conditional database update is the idempotency guard: repeated requests for the same status do not send duplicate messages. If Brevo is not configured, the recipient address is invalid, or delivery fails, the status remains updated, the failure is logged without credentials or email body, and Admin reports that no notification was sent. Configure `BREVO_API_KEY` and a Brevo-verified `EMAIL_FROM` before using these actions in production.
 
 ### Contact-link prefills
 
@@ -949,7 +949,7 @@ The health route returns HTTP `503` when the database query fails.
 - [ ] Invalid payloads return 400 and excessive requests return 429
 - [ ] Accepting/rejecting a lead sends one customer email for the transition
 - [ ] Repeating the same decision sends no duplicate email
-- [ ] Missing Resend configuration/provider failure leaves status updated and shows a notification warning
+- [ ] Missing Brevo configuration/provider failure leaves status updated and shows a notification warning
 
 #### Admin
 
@@ -991,7 +991,7 @@ Before starting the application in a new environment, apply the database schema 
 2. Set `DATABASE_URL`.
 3. Set a strong `ADMIN_PASSWORD`.
 4. Set an independent random `ADMIN_SECRET`.
-5. Set `EMAIL_API_KEY` and a Resend-verified `EMAIL_FROM` to enable decision emails.
+5. Set `BREVO_API_KEY` and a Brevo-verified `EMAIL_FROM` to enable decision emails.
 6. Optionally set a read-only `GITHUB_TOKEN` for connected discovery/private repository inspection.
 7. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin.
 8. Apply the database schema.
@@ -1057,7 +1057,7 @@ Test restore procedures in a non-production environment before relying on them.
 The current implementation is complete and functional, but these boundaries should be understood before a larger-scale launch:
 
 1. **Hybrid CMS:** services, portfolio/product concepts, pricing, hero, About copy, process, technology, and legal templates are not editable from `/admin`; they live in `src/lib/site.ts`.
-2. **No submission receipt email:** new briefs are stored in PostgreSQL without an automatic acknowledgement. Resend emails are sent after an admin accepts/rejects a lead when `EMAIL_API_KEY` and `EMAIL_FROM` are configured.
+2. **No submission receipt email:** new briefs are stored in PostgreSQL without an automatic acknowledgement. Brevo emails are sent after an admin accepts/rejects a lead when `BREVO_API_KEY` and `EMAIL_FROM` are configured.
 3. **Single-admin authentication:** there are no user accounts, roles, password reset flow, or 2FA.
 4. **Process-local rate limiting:** suitable as a basic single-instance control, not distributed infrastructure.
 5. **No media upload system:** blog and testimonial admin forms do not upload images or files.
@@ -1114,7 +1114,7 @@ This audit records the repository and local application state reviewed on 2026-0
 | `/sitemap.xml`, `/robots.txt` | Generated routes and published-article sitemap; admin/API disallowed from crawling. | Both returned `200` locally. Production must set `NEXT_PUBLIC_SITE_URL`; code now fails instead of emitting localhost metadata when it is absent. `robots.txt` is not access control. |
 | `/api/health` | Application/database health response; local check returned `200` with Neon up. | Add external uptime monitoring and alerting; keep internals out of public errors. |
 | `/api/contact`, `/api/track`, `/api/site-settings` | Lead submission, first-party analytics, and public-only settings endpoints. | Lead validation/persistence are implemented. There is no submission receipt email. Analytics stores validated referrer origins instead of full URLs. Rate limits remain process-local and depend on a sanitized `x-forwarded-for` from the hosting edge. No consent system is integrated; assess requirements against actual jurisdictions and analytics use. |
-| `/api/admin/*` | Session, leads, stats, CMS content/settings, and GitHub-management endpoints. | Accepted/rejected transitions atomically trigger one server-side Resend notification; unchanged statuses do not re-send. Email failures are logged and surfaced without rolling back status. Single-admin auth and process-local rate limits do not provide multi-user governance or a shared global ceiling. |
+| `/api/admin/*` | Session, leads, stats, CMS content/settings, and GitHub-management endpoints. | Accepted/rejected transitions atomically trigger one server-side Brevo notification; unchanged statuses do not re-send. Email failures are logged and surfaced without rolling back status. Single-admin auth and process-local rate limits do not provide multi-user governance or a shared global ceiling. |
 
 ### Information architecture and positioning
 
@@ -1158,7 +1158,7 @@ These are recommendations, not current routes. Add them only when supported by r
 - `src/components/contact-form.tsx`: required fields expose required state and associate validation errors with controls.
 - `src/app/about/page.tsx`: removed an inaccurate claim that team/company details are managed in Admin.
 - `src/app/legal/[doc]/page.tsx`: removed a generated legal “Last updated” date that reflected build time rather than review.
-- `src/lib/lead-email.ts`, `src/app/api/admin/leads/route.ts`: added server-side Resend templates and authenticated, idempotent decision notifications; no schema migration was needed because `leads.status` is text.
+- `src/lib/lead-email.ts`, `src/app/api/admin/leads/route.ts`: added server-side Brevo templates and authenticated, idempotent decision notifications; no schema migration was needed because `leads.status` is text.
 - `src/components/admin/admin-app.tsx`, `src/lib/site.ts`: added Accept/Reject actions, loading/delivery feedback, and `accepted`/`rejected` status values.
 
 ### Priority roadmap
@@ -1167,7 +1167,7 @@ These are recommendations, not current routes. Add them only when supported by r
 
 1. Set and verify production `DATABASE_URL`, strong `ADMIN_PASSWORD`, independent `ADMIN_SECRET`, and final HTTPS `NEXT_PUBLIC_SITE_URL` in Vercel; rotate any credential disclosed outside a secret manager. This prevents insecure access and incorrect SEO URLs.
 2. Have Privacy, Terms, and Cookie templates reviewed against the actual business entity, jurisdiction, data processors, retention, and analytics/storage practices.
-3. Configure Resend and establish lead ownership. Decision emails are supported, but new submissions do not receive an automatic acknowledgement; response-time commitments still depend on someone monitoring leads.
+3. Configure Brevo and establish lead ownership. Decision emails are supported, but new submissions do not receive an automatic acknowledgement; response-time commitments still depend on someone monitoring leads.
 4. Confirm the production edge sanitizes `x-forwarded-for`; otherwise rate-limit identity can be spoofed.
 
 #### Phase 2 — Core UX/content improvements
@@ -1261,7 +1261,7 @@ The built-in FAQ set remains active until at least one published database FAQ ex
 
 ### A new contact brief does not trigger an email
 
-That is expected: submission receipt emails are not sent. The brief is stored in Admin → Leads. After an administrator accepts or rejects it, Resend sends the decision email if `EMAIL_API_KEY` and a Resend-verified `EMAIL_FROM` are configured.
+That is expected: submission receipt emails are not sent. The brief is stored in Admin → Leads. After an administrator accepts or rejects it, Brevo sends the decision email if `BREVO_API_KEY` and a Brevo-verified `EMAIL_FROM` are configured.
 
 ### GitHub import says the URL is not a repository
 

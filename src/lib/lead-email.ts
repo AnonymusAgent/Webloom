@@ -1,5 +1,4 @@
 import "server-only";
-import { Resend } from "resend";
 import type { Lead } from "@/db/schema";
 import { SITE } from "@/lib/site";
 
@@ -10,6 +9,15 @@ export type LeadEmailResult =
   | { sent: false; reason: "not_configured" | "invalid_email" | "provider_error" };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BREVO_EMAIL_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
+
+function parseMailbox(value: string) {
+  const formatted = value.trim().match(/^(.*?)\s*<([^<>]+)>$/);
+  const email = (formatted?.[2] ?? value).trim();
+  if (!EMAIL_PATTERN.test(email)) return null;
+  const name = formatted?.[1].trim().replace(/^"|"$/g, "");
+  return { email, ...(name ? { name } : {}) };
+}
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, (character) => {
@@ -28,12 +36,14 @@ export async function sendLeadDecisionEmail(
   lead: Lead,
   decision: Decision
 ): Promise<LeadEmailResult> {
-  const apiKey = process.env.EMAIL_API_KEY?.trim();
+  const apiKey = process.env.BREVO_API_KEY?.trim();
   const from = process.env.EMAIL_FROM?.trim();
   if (!apiKey || !from) return { sent: false, reason: "not_configured" };
 
-  const recipient = lead.email.trim();
-  if (!EMAIL_PATTERN.test(recipient)) return { sent: false, reason: "invalid_email" };
+  const recipient = parseMailbox(lead.email);
+  const sender = parseMailbox(from);
+  const replyTo = parseMailbox(process.env.EMAIL_REPLY_TO?.trim() || SITE.email);
+  if (!recipient || !sender || !replyTo) return { sent: false, reason: "invalid_email" };
 
   const name = lead.name.trim() || "there";
   const projectType = lead.projectType.trim() || "Project brief";
@@ -91,17 +101,26 @@ export async function sendLeadDecisionEmail(
 </html>`;
 
   try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
-      from,
-      replyTo: process.env.EMAIL_REPLY_TO?.trim() || SITE.email,
-      to: recipient,
-      subject,
-      text,
-      html,
+    const response = await fetch(BREVO_EMAIL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "api-key": apiKey,
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender,
+        to: [recipient],
+        replyTo,
+        subject,
+        textContent: text,
+        htmlContent: html,
+      }),
+      signal: AbortSignal.timeout(10_000),
     });
-    if (error) return { sent: false, reason: "provider_error" };
-    return { sent: true };
+    return response.ok
+      ? { sent: true }
+      : { sent: false, reason: "provider_error" };
   } catch {
     return { sent: false, reason: "provider_error" };
   }

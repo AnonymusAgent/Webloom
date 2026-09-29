@@ -67,7 +67,7 @@ export async function PATCH(req: Request) {
     }
 
     const message = result.reason === "not_configured"
-      ? "Status updated, but email is not configured. Add EMAIL_API_KEY and EMAIL_FROM."
+      ? "Status updated, but email is not configured. Add BREVO_API_KEY and EMAIL_FROM."
       : result.reason === "invalid_email"
         ? "Status updated, but the customer email address is missing or invalid."
         : "Status updated, but the customer email could not be sent. Check the Activity log.";
