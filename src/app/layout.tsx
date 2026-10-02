@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE, SOCIALS } from "@/lib/site";
 import Chrome from "@/components/chrome";
 import "./globals.css";
@@ -93,6 +94,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <Chrome settings={settings}>{children}</Chrome>
+        <SpeedInsights />
       </body>
     </html>
   );
