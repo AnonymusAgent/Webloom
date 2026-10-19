@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -83,6 +82,7 @@ export default function Nav() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      prefetch={false}
                       aria-current={active ? "page" : undefined}
                       className={cn(
                         "relative rounded-full px-3.5 py-2 text-[0.83rem] font-medium transition-colors duration-300",
@@ -90,11 +90,7 @@ export default function Nav() {
                       )}
                     >
                       {active && (
-                        <motion.span
-                          layoutId="nav-pill"
-                          className="absolute inset-0 rounded-full border border-line bg-card"
-                          transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                        />
+                        <span className="absolute inset-0 rounded-full border border-line bg-card" />
                       )}
                       <span className="relative z-10">{item.label}</span>
                     </Link>
@@ -107,6 +103,7 @@ export default function Nav() {
               <ThemeToggle compact />
               <Link
                 href="/contact"
+                prefetch={false}
                 data-track="nav_start_project"
                 className="group hidden items-center gap-2 rounded-full bg-brand px-4.5 py-2 text-[0.83rem] font-semibold text-brandink transition-all duration-300 hover:shadow-[0_6px_24px_-6px_var(--brand)] active:scale-[0.97] sm:inline-flex"
               >
@@ -130,16 +127,11 @@ export default function Nav() {
       </header>
 
       {/* mobile overlay */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
+      {open && (
+          <div
             id="mobile-menu"
             ref={menuDialog}
             className="fixed inset-0 z-[70] flex flex-col overflow-y-auto bg-bg/95 backdrop-blur-2xl lg:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
@@ -161,15 +153,10 @@ export default function Nav() {
                 {NAV.map((item, i) => {
                   const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
                   return (
-                    <motion.li
-                      key={item.href}
-                      initial={{ opacity: 0, y: 24 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 12 }}
-                      transition={{ delay: 0.06 * i + 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    >
+                    <li key={item.href}>
                       <Link
                         href={item.href}
+                        prefetch={false}
                         aria-current={active ? "page" : undefined}
                         onClick={closeMenu}
                         className={cn(
@@ -180,19 +167,15 @@ export default function Nav() {
                         <span className="font-mono text-xs text-mut">0{i + 1}</span>
                         {item.label}
                       </Link>
-                    </motion.li>
+                    </li>
                   );
                 })}
               </ul>
             </nav>
-            <motion.div
-              className="px-8 pb-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
+            <div className="px-8 pb-10">
               <Link
                 href="/contact"
+                prefetch={false}
                 onClick={closeMenu}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand py-4 font-semibold text-brandink"
               >
@@ -202,10 +185,9 @@ export default function Nav() {
                 <LogoMark className="h-5 w-5 opacity-60" />
                 <p className="text-xs text-mut">Digital products, built beautifully.</p>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+      )}
     </>
   );
 }

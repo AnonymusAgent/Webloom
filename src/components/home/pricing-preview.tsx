@@ -13,7 +13,7 @@ export default function PricingPreview() {
         <div className="flex flex-wrap items-end justify-between gap-8">
           <Reveal>
             <SectionHead
-              index="08"
+              index="06"
               kicker="Pricing"
               title={<span id="pricing-h">Clear, honest starting prices.</span>}
               lead="Websites, apps and software — estimated packages with no surprises. Apps and custom software pricing live on the full pricing page."

@@ -47,7 +47,7 @@ The application includes a public marketing website, interactive pricing and pro
 - Responsive sticky navigation and full-screen mobile menu
 - Lightweight, server-rendered hero with no WebGL, external imagery, or animation dependency
 - `prefers-reduced-motion` support throughout the site
-- Service, product, work, process, technology, pricing, FAQ, and conversion sections
+- Focused homepage: services, selected work, process, pricing, FAQ, and conversion sections; full product and technology details remain on Work and Services
 - Dedicated Services, Work, Pricing, About, Contact, Blog, and Legal pages
 - Source-verified GitHub project portfolio with eight original product covers and a supporting repository archive
 - Honest project labels: **Source verified**, **Webloom Product**, or **Product Concept**
@@ -109,7 +109,7 @@ The project uses the Next.js App Router and defaults to React Server Components.
 
 1. `src/app/layout.tsx` defines global metadata, fonts, Organization structured data, and the initial theme script.
 2. The layout reads database-backed contact/social settings through `src/lib/data.ts`.
-3. `src/components/chrome.tsx` adds the public navigation, footer, analytics tracker, reduced-motion configuration, and desktop cursor.
+3. `src/components/chrome.tsx` adds the public navigation, footer, and analytics tracker without a continuous cursor animation.
 4. Public pages compose reusable server and client components.
 5. Public CMS content is read through tagged five-minute Next.js caches backed by Drizzle/PostgreSQL; admin mutations expire the corresponding tag immediately.
 6. The client shell refreshes public contact/social settings from `/api/site-settings` after hydration without blocking the document shell.
@@ -170,12 +170,12 @@ This split keeps brand-critical layout content version-controlled while allowing
 │   │   ├── blog/                    # Blog search/filter UI
 │   │   ├── home/                    # Homepage section components
 │   │   ├── pricing/                 # Pricing tabs and estimator
-│   │   ├── chrome.tsx               # Public shell, tracker, custom cursor
+│   │   ├── chrome.tsx               # Public shell, settings, tracker
 │   │   ├── contact-form.tsx
 │   │   ├── faq.tsx
 │   │   ├── footer.tsx
 │   │   ├── github-work-section.tsx  # Published source-verified project cards
-│   │   ├── motion.tsx               # Shared reveal/magnetic motion primitives
+│   │   ├── motion.tsx               # Static reveal wrapper and easing token
 │   │   ├── nav.tsx
 │   │   ├── theme.tsx
 │   │   ├── tier-card.tsx
@@ -229,7 +229,7 @@ Generated directories such as `.next/` and dependency directories such as `node_
 | `/robots.txt` | Generated | Allows public pages; disallows `/admin` and `/api` |
 | Unknown routes | 404 | Branded “hasn’t bloomed yet” page |
 
-FAQ content is embedded on the homepage and Pricing page rather than exposed as a separate `/faq` route. Footer FAQ links target `/pricing#faq`.
+Six frequently asked questions appear on the homepage; the full list remains on Pricing. There is no separate `/faq` route. Footer FAQ links target `/pricing#faq`.
 
 ### API routes
 
@@ -784,10 +784,10 @@ Before launch:
 ### Motion
 
 - The homepage hero is server-rendered and does not load a WebGL engine, 3D scene, or animated fallback.
-- Framer Motion remains for interaction-specific components such as pricing tabs and FAQ accordions.
+- Framer Motion is used only by route-specific interactive components such as pricing tabs and the contact form. FAQ disclosures use native HTML without hydration.
 - CSS transitions and `prefers-reduced-motion` support remain throughout the site.
 
-The shared interaction primitives live in `src/components/motion.tsx`.
+The shared static wrapper and easing token live in `src/components/motion.tsx`. The homepage uses no WebGL, custom cursor, or always-running visual animation.
 
 ---
 
@@ -806,7 +806,7 @@ Implemented accessibility measures include:
 - Visible focus outlines
 - Estimator result announced with `aria-live`
 - Decorative graphics marked as hidden from assistive technology
-- Reduced-motion support in CSS, Framer Motion, and the custom cursor
+- Reduced-motion support in CSS and motion-enhanced route-specific controls
 - Responsive, touch-friendly controls
 
 When adding components, test keyboard-only use, 200% zoom, screen-reader labels, contrast, and reduced-motion behavior.

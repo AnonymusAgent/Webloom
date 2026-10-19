@@ -47,9 +47,9 @@ webloom/
 │   ├── components/                   # All React components (24 files)
 │   │   ├── admin/                    # Admin shell, panels, GitHub importer
 │   │   ├── blog/                     # Blog search/filter
-│   │   ├── home/                     # 13 homepage sections + hero
+│   │   ├── home/                     # Focused homepage sections + hero
 │   │   ├── pricing/                  # Pricing tabs + estimator
-│   │   ├── chrome.tsx                # Nav/footer shell, tracker, cursor
+│   │   ├── chrome.tsx                # Nav/footer shell, tracker
 │   │   ├── contact-form.tsx          # Validated project-brief form
 │   │   ├── faq.tsx                   # Accessible accordion + FAQ JSON-LD
 │   │   ├── github-work-section.tsx   # Verified projects + archive
@@ -88,7 +88,7 @@ webloom/
 
 | Route | Type | Purpose |
 |---|---|---|
-| `/` | ISR (5 min) | Homepage: static hero, services, products, verified work, process, tech, pricing, FAQ, CTA |
+| `/` | ISR (5 min) | Homepage: static hero, services, work, process, pricing, FAQ, CTA |
 | `/services` | Static | Six service detail blocks + technology overview |
 | `/work` | ISR (5 min) | Source-verified GitHub projects (8 featured + 9 archive) + product concepts |
 | `/pricing` | ISR (5 min) | Interactive pricing tabs, estimator, FAQ accordion |
@@ -148,7 +148,7 @@ All are documented in `.env.example`. `NODE_ENV` is framework-managed.
 
 - ✅ Server-rendered homepage hero with no 3D engine or animated fallback
 - ✅ Dark/light theme with persistence + no-flash script
-- ✅ Page transitions, scroll reveals, magnetic buttons, custom cursor
+- ✅ Native FAQ disclosures, static server-rendered sections, and CSS hover feedback
 - ✅ Pricing tabs (keyboard accessible) + live project estimator
 - ✅ Contact form: client+server validation, loading/success/error states, rate limiting
 - ✅ Admin: overview analytics, leads pipeline, blog/testimonial/FAQ CRUD, GitHub importer, settings, activity logs

@@ -14,7 +14,6 @@ export default function FinalCta() {
               width: s,
               height: s,
               opacity: 0.9 - i * 0.22,
-              animation: `floaty ${7 + i * 1.4}s ease-in-out ${i * 0.7}s infinite`,
             }}
           />
         ))}

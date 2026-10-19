@@ -21,7 +21,7 @@ export default function GlobalError({
     <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-6 text-center">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: "var(--halo)" }} />
       <Container className="relative flex flex-col items-center">
-        <LogoMark className="h-11 w-11 animate-spin-slower" />
+        <LogoMark className="h-11 w-11" />
         <p className="kicker mt-8">Something went wrong</p>
         <h1 className="mt-4 max-w-xl text-balance text-[clamp(1.9rem,4.5vw,3.2rem)] font-semibold leading-[1.08] tracking-[-0.02em]">
           A petal fell off. We&apos;re putting it back.

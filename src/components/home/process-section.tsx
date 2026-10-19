@@ -1,20 +1,8 @@
-"use client";
-
-import { useRef } from "react";
-import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
 import { PROCESS } from "@/lib/site";
 import { Button, Container, SectionHead } from "@/components/ui";
 import { Reveal } from "@/components/motion";
 
 export default function ProcessSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 0.75", "end 0.6"],
-  });
-  const progress = useSpring(scrollYProgress, { stiffness: 90, damping: 24 });
-
   return (
     <section className="relative py-24 md:py-36" aria-labelledby="process-h">
       <Container>
@@ -22,7 +10,7 @@ export default function ProcessSection() {
           <div className="lg:sticky lg:top-32 lg:self-start">
             <Reveal>
               <SectionHead
-                index="06"
+                index="05"
                 kicker="Process"
                 title={<span id="process-h">From idea to launch.</span>}
                 lead="A clear, transparent way of working. You always know what's happening, what's next and why."
@@ -37,16 +25,9 @@ export default function ProcessSection() {
             </Reveal>
           </div>
 
-          <div ref={ref} className="relative">
+          <div className="relative">
             {/* track */}
             <span aria-hidden="true" className="absolute left-[7px] top-2 bottom-2 w-px bg-line" />
-            {!reduce && (
-              <motion.span
-                aria-hidden="true"
-                className="absolute left-[7px] top-2 bottom-2 w-px origin-top bg-brand"
-                style={{ scaleY: progress }}
-              />
-            )}
             <ol className="space-y-2">
               {PROCESS.map((step, i) => (
                 <Reveal key={step.n} delay={i * 0.04} y={20}>

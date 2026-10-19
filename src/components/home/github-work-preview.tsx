@@ -15,7 +15,7 @@ export default function GithubWorkPreview({ projects }: { projects: GithubProjec
         <div className="flex flex-wrap items-end justify-between gap-8">
           <Reveal>
             <SectionHead
-              index="04"
+              index="03"
               kicker="Verified work"
               title={<span id="verified-work-h">Real products, visible in the source.</span>}
               lead="Selected builds from Webloom's public GitHub—described from the screens, components, services and manifests actually implemented."
@@ -44,6 +44,7 @@ export default function GithubWorkPreview({ projects }: { projects: GithubProjec
               <Reveal key={project.id} delay={(index % 2) * 0.08} className="h-full">
                 <Link
                   href={`/work#${project.slug}`}
+                  prefetch={false}
                   data-track={`home_github_${project.slug}`}
                   className="card-surface group/card flex h-full flex-col overflow-hidden"
                 >

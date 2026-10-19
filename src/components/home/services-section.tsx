@@ -6,7 +6,7 @@ import { Reveal } from "@/components/motion";
 
 export default function ServicesSection() {
   return (
-    <section className="py-24 md:py-36" aria-labelledby="services-h">
+    <section id="services" className="scroll-mt-24 py-24 md:py-36" aria-labelledby="services-h">
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-8">
           <Reveal>

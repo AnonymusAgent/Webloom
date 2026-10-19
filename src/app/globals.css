@@ -50,51 +50,6 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-mono-alt), ui-monospace, "SF Mono", Menlo, monospace;
   --shadow-soft: var(--shadow);
-  --animate-marquee: marquee 42s linear infinite;
-  --animate-spin-slower: wlspin 22s linear infinite;
-  --animate-float-y: floaty 7s ease-in-out infinite;
-}
-
-@keyframes wlspin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes dashmove {
-  to {
-    stroke-dashoffset: -5.6;
-  }
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes floaty {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes ringbloom {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(1.6);
-    opacity: 0;
-  }
 }
 
 /* ---------------------------------- base ----------------------------------- */
@@ -165,11 +120,9 @@ body {
 
   .text-gradient-brand {
     background: linear-gradient(100deg, var(--ink) 20%, var(--brand) 55%, var(--ink) 80%);
-    background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: sheen 9s ease-in-out infinite;
   }
 
   .ring-bloom {
@@ -177,7 +130,6 @@ body {
     inset: 0;
     border-radius: 9999px;
     border: 1px solid var(--line2);
-    animation: ringbloom 5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
   }
 
   .kicker {
@@ -195,31 +147,6 @@ body {
     display: none;
   }
 
-  .marquee-mask {
-    mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
-  }
-}
-
-.grain::after {
-  content: "";
-  position: fixed;
-  inset: -50%;
-  width: 200%;
-  height: 200%;
-  pointer-events: none;
-  z-index: 60;
-  opacity: 0.032;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-@keyframes sheen {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

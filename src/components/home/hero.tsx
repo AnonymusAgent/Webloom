@@ -44,7 +44,7 @@ export default function Hero() {
       </div>
 
       <a
-        href="#capabilities"
+        href="#services"
         aria-label="Scroll to content"
         className="absolute bottom-7 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-mut transition-colors hover:text-ink sm:flex"
       >
