@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageSeo } from "@/lib/seo";
 import PricingTabs, { CombinationNote } from "@/components/pricing/pricing-tabs";
 import Estimator from "@/components/pricing/estimator";
 import Faq, { FaqJsonLd } from "@/components/faq";
@@ -9,12 +9,7 @@ import { getFaqs } from "@/lib/data";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "Pricing — Websites, Apps, Software & SaaS",
-  description:
-    "Transparent starting prices for websites (from $299), mobile apps (from $999), custom software (from $2,500+) and SaaS platforms — plus a quick project estimator.",
-  alternates: { canonical: "/pricing" },
-};
+export const metadata = pageSeo("Pricing — Websites, Apps, Software & SaaS", "Transparent starting prices for websites (from $299), mobile apps (from $999), custom software (from $2,500+) and SaaS platforms — plus a quick project estimator.", "/pricing");
 
 export default async function PricingPage() {
   const faqs = await getFaqs();

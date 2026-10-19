@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/json-ld";
 import Hero from "@/components/home/hero";
 import TrustStrip from "@/components/home/trust-strip";
 import ServicesSection from "@/components/home/services-section";
@@ -40,7 +41,7 @@ export default async function Home() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(serviceSchema) }}
       />
       <FaqJsonLd items={faqs} />
       <Hero />

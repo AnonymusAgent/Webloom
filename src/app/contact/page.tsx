@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageSeo } from "@/lib/seo";
 import { CalendarCheck, Mail, MessagesSquare, SearchCheck } from "lucide-react";
 import ContactForm, { type ContactInitial } from "@/components/contact-form";
 import { Container } from "@/components/ui";
@@ -7,12 +7,7 @@ import { getPublicSettings } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Contact — Let's build something worth building",
-  description:
-    "Tell Webloom about your project: websites, mobile apps, SaaS, custom software, AI products or improvements to an existing product. We reply within one business day.",
-  alternates: { canonical: "/contact" },
-};
+export const metadata = pageSeo("Contact — Let's build something worth building", "Tell Webloom about your project: websites, mobile apps, SaaS, custom software, AI products or improvements to an existing product. We reply within one business day.", "/contact");
 
 const NEXT_STEPS = [
   {

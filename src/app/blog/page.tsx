@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageSeo } from "@/lib/seo";
 import BlogList from "@/components/blog/blog-list";
 import { Container } from "@/components/ui";
 import { Reveal } from "@/components/motion";
@@ -7,12 +7,7 @@ import { POST_CATEGORIES } from "@/lib/site";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "Insights — Notes on Building Digital Products",
-  description:
-    "Webloom insights on web development, mobile apps, SaaS, AI, business software, UI/UX and product development.",
-  alternates: { canonical: "/blog" },
-};
+export const metadata = pageSeo("Insights — Notes on Building Digital Products", "Webloom insights on web development, mobile apps, SaaS, AI, business software, UI/UX and product development.", "/blog");
 
 export default async function BlogPage() {
   const posts = await getPosts();

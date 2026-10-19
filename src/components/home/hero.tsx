@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { HERO } from "@/lib/site";
 import { Button } from "@/components/ui";
-import { WordReveal, EASE } from "@/components/motion";
+import { EASE } from "@/components/motion";
 
 function HeroSceneFallback() {
   return (
@@ -32,13 +32,30 @@ export default function Hero() {
   const [sceneReady, setSceneReady] = useState(false);
 
   useEffect(() => {
-    if (reduce) return;
-    const timer = window.setTimeout(() => setSceneReady(true), 700);
-    return () => window.clearTimeout(timer);
+    // Keep the animated scene as progressive enhancement for capable desktop devices.
+    // Mobile, reduced-motion and coarse-pointer visitors get the CSS visual only.
+    if (reduce || !window.matchMedia("(min-width: 1024px) and (pointer: fine)").matches) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let idle: number | undefined;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      if ("requestIdleCallback" in window) {
+        idle = window.requestIdleCallback(() => setSceneReady(true), { timeout: 2500 });
+      } else {
+        timer = setTimeout(() => setSceneReady(true), 1800);
+      }
+    });
+    observer.observe(document.querySelector("#home-hero")!);
+    return () => {
+      observer.disconnect();
+      if (timer !== undefined) window.clearTimeout(timer);
+      if (idle !== undefined) window.cancelIdleCallback(idle);
+    };
   }, [reduce]);
 
   return (
-    <section className="relative flex min-h-svh flex-col overflow-hidden" aria-label="Intro">
+    <section id="home-hero" className="relative flex min-h-svh flex-col overflow-hidden" aria-label="Intro">
       {/* halo + grid backdrop */}
       <div aria-hidden="true" className="absolute inset-0" style={{ background: "var(--halo)" }} />
       <div
@@ -74,14 +91,14 @@ export default function Hero() {
           </span>
         </motion.p>
 
-        <h1 className="max-w-5xl text-balance text-[clamp(2.6rem,7.2vw,5.6rem)] font-semibold leading-[1.02] tracking-[-0.03em]">
-          <WordReveal text={HERO.headline} delay={0.25} stagger={0.05} />
+        <h1 className="max-w-5xl text-balance text-[clamp(2.35rem,6.4vw,5rem)] font-semibold leading-[1.02] tracking-[-0.03em]">
+          {HERO.headline}
         </h1>
 
         <motion.p
           initial={reduce ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE, delay: 0.85 }}
+          transition={{ duration: 0.8, ease: EASE, delay: 0.2 }}
           className="mt-7 max-w-xl text-pretty text-base leading-relaxed text-mut sm:text-lg"
         >
           {HERO.sub}
@@ -90,7 +107,7 @@ export default function Hero() {
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE, delay: 1.05 }}
+          transition={{ duration: 0.8, ease: EASE, delay: 0.3 }}
           className="mt-10 flex flex-col items-center gap-3 sm:flex-row"
         >
           <Button href={HERO.primary.href} size="lg" track="hero_start_project">

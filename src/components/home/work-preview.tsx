@@ -35,7 +35,7 @@ export default function WorkPreview() {
           {PRODUCTS.map((p, i) => (
             <Reveal key={p.slug} delay={i * 0.05} y={16}>
               <Link
-                href={`/work#${p.slug}`}
+                href={`/work/${p.slug}`}
                 data-track={`work_row_${p.slug}`}
                 className="group relative flex items-center gap-5 overflow-hidden py-7 transition-all duration-500 sm:gap-8 sm:py-9"
               >

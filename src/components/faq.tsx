@@ -1,5 +1,7 @@
 "use client";
 
+import { jsonLd } from "@/lib/json-ld";
+
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus } from "lucide-react";
@@ -77,5 +79,5 @@ export function FaqJsonLd({ items }: { items: FaqItem[] }) {
       acceptedAnswer: { "@type": "Answer", text: f.answer },
     })),
   };
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />;
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />;
 }

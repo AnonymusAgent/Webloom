@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { leads } from "@/db/schema";
 import { rateLimit } from "@/lib/rate-limit";
-import { log } from "@/lib/data";
+import { log, trackEvent } from "@/lib/data";
 import { BUDGETS, PROJECT_TYPES, TIMELINES } from "@/lib/site";
 
 export const runtime = "nodejs";
@@ -22,11 +22,27 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json().catch(() => null);
-    if (!body || typeof body !== "object") {
+    if (Number(req.headers.get("content-length")) > 10_000) {
+      return NextResponse.json({ error: "Your brief is too long." }, { status: 413 });
+    }
+    const raw = await req.text();
+    if (raw.length > 10_000) {
+      return NextResponse.json({ error: "Your brief is too long." }, { status: 413 });
+    }
+    let body: Record<string, unknown> | null;
+    try {
+      body = JSON.parse(raw || "null") as Record<string, unknown> | null;
+    } catch {
+      return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+    }
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
       return NextResponse.json({ error: "Invalid request." }, { status: 400 });
     }
 
+    // Honeypot: genuine visitors never interact with this hidden field.
+    if (body.website) {
+      return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+    }
     const name = clean(body.name, 120);
     const company = clean(body.company, 120);
     const email = clean(body.email, 160);
@@ -65,12 +81,13 @@ export async function POST(req: Request) {
       source: "contact",
     });
 
-    await log("info", "lead_created", { projectType, budget });
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    await log("error", "contact_error", {
-      error: err instanceof Error ? err.message : "unknown",
-    });
+    await Promise.all([
+      log("info", "lead_created", { projectType, budget }),
+      trackEvent({ type: "event", name: "form_success", path: "/contact" }),
+    ]);
+    return NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
+  } catch {
+    await log("error", "contact_error");
     return NextResponse.json(
       { error: "We couldn't send your brief. Please try again." },
       { status: 500 }

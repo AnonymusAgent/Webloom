@@ -55,6 +55,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
     budget: "",
     timeline: "",
     message: initial?.message ?? "",
+    website: "",
   });
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
@@ -90,7 +91,10 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
   async function onSubmit(ev: React.FormEvent) {
     ev.preventDefault();
     if (status === "sending") return;
-    if (!validate()) return;
+    if (!validate()) {
+      setStatus("idle");
+      return;
+    }
     setStatus("sending");
     setServerError("");
     try {
@@ -128,13 +132,13 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
         <h3 className="mt-6 text-2xl font-semibold tracking-tight">Brief received.</h3>
         <p className="mt-3 max-w-sm text-sm leading-relaxed text-mut">
           Thank you, {form.name.split(" ")[0]}. We&apos;ll read everything carefully and get back
-          to you — usually within one business day.
+          to you after reviewing your project.
         </p>
         <button
           type="button"
           onClick={() => {
             setStatus("idle");
-            setForm({ name: "", company: "", email: "", phone: "", projectType: "", budget: "", timeline: "", message: "" });
+            setForm({ name: "", company: "", email: "", phone: "", projectType: "", budget: "", timeline: "", message: "", website: "" });
             started.current = false;
           }}
           className="mt-8 inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm font-medium text-mut transition-all hover:border-line2 hover:text-ink"
@@ -153,6 +157,15 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
       className="card-surface space-y-5 p-7 sm:p-9"
       aria-label="Project brief form"
     >
+      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label htmlFor="wl-website">Leave this field empty</label>
+        <input id="wl-website" name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => set("website", e.target.value)} />
+      </div>
+      {Object.keys(errors).length > 0 && (
+        <p role="alert" className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-ink">
+          Please check the highlighted fields before sending your brief.
+        </p>
+      )}
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Name" required error={errors.name} errorId="name-error">
           <input
@@ -298,7 +311,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             role="alert"
-            className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-300"
+            className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-ink"
           >
             {serverError || "Couldn't send your brief. Please try again."}
           </motion.p>
@@ -308,7 +321,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
       <button
         type="submit"
         disabled={status === "sending"}
-        data-track="form_submit"
+        data-track="form_attempt"
         className="group flex w-full items-center justify-center gap-2 rounded-full bg-brand px-6 py-4 text-sm font-semibold text-brandink transition-all duration-300 hover:shadow-[0_8px_30px_-6px_var(--brand)] active:scale-[0.99] disabled:opacity-70"
       >
         {status === "sending" ? (

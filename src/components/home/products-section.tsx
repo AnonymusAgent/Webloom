@@ -81,7 +81,7 @@ function ProductCard({ p }: { p: Product }) {
           <p className="text-[0.8rem] font-medium italic text-mut">“{p.outcome}”</p>
         </div>
         <Link
-          href={`/work#${p.slug}`}
+          href={`/work/${p.slug}`}
           data-track={`product_${p.slug}`}
           className="mt-5 inline-flex w-fit items-center gap-2 text-sm font-medium text-ink transition-colors hover:text-brand"
         >

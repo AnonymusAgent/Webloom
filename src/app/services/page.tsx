@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageSeo } from "@/lib/seo";
 import { ArrowRight, Check } from "lucide-react";
 import { SERVICES, TECH } from "@/lib/site";
 import { Button, Container } from "@/components/ui";
@@ -7,12 +7,7 @@ import ImproveSection from "@/components/improve-section";
 import FinalCta from "@/components/home/final-cta";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Services — Websites, Apps, SaaS & Custom Software",
-  description:
-    "Webloom designs and builds websites, mobile apps, SaaS platforms, custom business software, AI-powered products and premium UI/UX design systems.",
-  alternates: { canonical: "/services" },
-};
+export const metadata = pageSeo("Services — Websites, Apps, SaaS & Custom Software", "Webloom designs and builds websites, mobile apps, SaaS platforms, custom business software, AI-powered products and premium UI/UX design systems.", "/services");
 
 export default function ServicesPage() {
   return (

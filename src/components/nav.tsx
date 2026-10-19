@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { NAV } from "@/lib/site";
@@ -14,6 +14,12 @@ export default function Nav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const menuDialog = useRef<HTMLDivElement>(null);
+  const closeMenu = () => {
+    setOpen(false);
+    menuButton.current?.focus();
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
@@ -23,14 +29,29 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
     if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        closeMenu();
+      } else if (e.key === "Tab") {
+        const focusable = menuDialog.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])");
+        if (!focusable?.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
@@ -97,7 +118,9 @@ export default function Nav() {
                 onClick={() => setOpen(true)}
                 aria-label="Open menu"
                 aria-expanded={open}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink transition-colors hover:border-line2 lg:hidden"
+                aria-controls="mobile-menu"
+                ref={menuButton}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink transition-colors hover:border-line2 lg:hidden"
               >
                 <Menu className="h-4 w-4" />
               </button>
@@ -110,7 +133,9 @@ export default function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[70] flex flex-col bg-bg/95 backdrop-blur-2xl lg:hidden"
+            id="mobile-menu"
+            ref={menuDialog}
+            className="fixed inset-0 z-[70] flex flex-col overflow-y-auto bg-bg/95 backdrop-blur-2xl lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -123,10 +148,10 @@ export default function Nav() {
               <Logo />
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={closeMenu}
                 aria-label="Close menu"
                 autoFocus
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line transition-colors hover:border-line2"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line transition-colors hover:border-line2"
               >
                 <X className="h-4.5 w-4.5" />
               </button>
@@ -146,7 +171,7 @@ export default function Nav() {
                       <Link
                         href={item.href}
                         aria-current={active ? "page" : undefined}
-                        onClick={() => setOpen(false)}
+                        onClick={closeMenu}
                         className={cn(
                           "group flex items-baseline gap-4 py-3 text-4xl font-semibold tracking-tight transition-colors",
                           active ? "text-brand" : "text-ink hover:text-brand"
@@ -168,7 +193,7 @@ export default function Nav() {
             >
               <Link
                 href="/contact"
-                onClick={() => setOpen(false)}
+                onClick={closeMenu}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand py-4 font-semibold text-brandink"
               >
                 Start a Project <ArrowRight className="h-4 w-4" />
