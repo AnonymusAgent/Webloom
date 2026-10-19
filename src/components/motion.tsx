@@ -54,41 +54,6 @@ export function Magnetic({ children, strength = 0.25 }: { children: ReactNode; s
   );
 }
 
-/* ---------------------------- word-by-word reveal -------------------------- */
-
-export function WordReveal({
-  text,
-  className,
-  delay = 0,
-  stagger = 0.045,
-}: {
-  text: string;
-  className?: string;
-  delay?: number;
-  stagger?: number;
-}) {
-  const reduce = useReducedMotion();
-  const words = text.split(" ");
-  if (reduce) return <span className={className}>{text}</span>;
-  return (
-    <span className={className} aria-label={text} role="text">
-      {words.map((w, i) => (
-        <span key={i} className="inline-block overflow-hidden pb-[0.08em] -mb-[0.08em] align-bottom">
-          <motion.span
-            className="inline-block will-change-transform"
-            initial={{ y: "110%", rotate: 2, opacity: 0 }}
-            animate={{ y: "0%", rotate: 0, opacity: 1 }}
-            transition={{ duration: 0.9, delay: delay + i * stagger, ease: EASE }}
-          >
-            {w}
-            {i < words.length - 1 ? " " : ""}
-          </motion.span>
-        </span>
-      ))}
-    </span>
-  );
-}
-
 /* -------------------------------- counters --------------------------------- */
 
 export function FadeStagger({

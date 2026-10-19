@@ -26,7 +26,7 @@ The application includes a public marketing website, interactive pricing and pro
 12. [Contact and lead workflow](#contact-and-lead-workflow)
 13. [Analytics](#analytics)
 14. [SEO and social sharing](#seo-and-social-sharing)
-15. [Theme, motion, and 3D](#theme-motion-and-3d)
+15. [Theme and motion](#theme-and-motion)
 16. [Accessibility](#accessibility)
 17. [Security](#security)
 18. [Development commands](#development-commands)
@@ -45,9 +45,7 @@ The application includes a public marketing website, interactive pricing and pro
 
 - Premium dark-first visual system with a persistent light mode
 - Responsive sticky navigation and full-screen mobile menu
-- Interactive Three.js hero bloom with particles, orbital rings, and glass UI panels
-- Mouse and scroll response on desktop
-- Reduced 3D complexity on mobile
+- Lightweight, server-rendered hero with no WebGL, external imagery, or animation dependency
 - `prefers-reduced-motion` support throughout the site
 - Service, product, work, process, technology, pricing, FAQ, and conversion sections
 - Dedicated Services, Work, Pricing, About, Contact, Blog, and Legal pages
@@ -87,11 +85,10 @@ The application includes a public marketing website, interactive pricing and pro
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 16.2, App Router |
+| Framework | Next.js 16.4, App Router |
 | UI | React 19.2, TypeScript 5.9 |
 | Styling | Tailwind CSS 4.1, custom design tokens |
 | Motion | Framer Motion 13 |
-| 3D | Three.js, React Three Fiber, Drei |
 | Icons | Lucide React plus custom SVG brand marks |
 | Database | PostgreSQL |
 | ORM | Drizzle ORM with `node-postgres` |
@@ -177,7 +174,6 @@ This split keeps brand-critical layout content version-controlled while allowing
 │   │   ├── contact-form.tsx
 │   │   ├── faq.tsx
 │   │   ├── footer.tsx
-│   │   ├── hero3d.tsx
 │   │   ├── github-work-section.tsx  # Published source-verified project cards
 │   │   ├── motion.tsx               # Shared reveal/magnetic motion primitives
 │   │   ├── nav.tsx
@@ -633,7 +629,7 @@ The following content is centralized in `src/lib/site.ts` and requires a deploym
 | Logo component | `src/components/ui.tsx` |
 | Favicon/application icon | `src/app/icon.svg` |
 | Social sharing artwork | `public/og-image.jpg` |
-| 3D hero scene | `src/components/hero3d.tsx` |
+| Lightweight homepage hero | `src/components/home/hero.tsx` |
 | Navigation behavior | `src/components/nav.tsx` |
 | Footer columns | `src/components/footer.tsx` |
 | Per-page SEO metadata | Each route’s `page.tsx` |
@@ -778,44 +774,20 @@ Before launch:
 
 ---
 
-## Theme, motion, and 3D
+## Theme and motion
 
 ### Theme
 
-- Dark mode is the default.
-- The user can switch to light mode from the navigation.
-- Preference is stored in local storage as `wl-theme`.
-- A small inline script in the root layout applies the stored preference before paint to reduce theme flash.
+- Dark mode is the default; visitors can switch to light mode from the navigation.
+- The preference is stored in local storage as `wl-theme` and applied before paint.
 
 ### Motion
 
-Framer Motion powers:
+- The homepage hero is server-rendered and does not load a WebGL engine, 3D scene, or animated fallback.
+- Framer Motion remains for interaction-specific components such as pricing tabs and FAQ accordions.
+- CSS transitions and `prefers-reduced-motion` support remain throughout the site.
 
-- Route transitions
-- Headline and card reveals
-- Pricing-tab transitions
-- FAQ accordion transitions
-- Process progression
-- Magnetic primary buttons
-
-The shared primitives live in `src/components/motion.tsx`.
-
-### 3D hero
-
-The hero scene is dynamically imported on the client and implemented in `src/components/hero3d.tsx`. A matching CSS-only bloom/architecture fallback renders in the initial HTML. WebGL mounting is deferred briefly until the text and controls hydrate, and it is skipped for reduced-motion users.
-
-Performance/accessibility behavior includes:
-
-- Immediate CSS visual while the Three.js chunk loads
-- Deferred WebGL work to protect initial interaction and text rendering
-- Reduced particle counts and removal of glass panels on mobile
-- Device pixel-ratio limits
-- `powerPreference: high-performance`
-- Inert canvas pointer events so text and controls remain usable
-- Window-level pointer tracking for subtle rotation
-- Reduced-motion handling
-
-When modifying the 3D scene, preserve these fallbacks and test on low-power mobile devices.
+The shared interaction primitives live in `src/components/motion.tsx`.
 
 ---
 
@@ -834,7 +806,7 @@ Implemented accessibility measures include:
 - Visible focus outlines
 - Estimator result announced with `aria-live`
 - Decorative graphics marked as hidden from assistive technology
-- Reduced-motion support in CSS, Framer Motion, custom cursor, and 3D behavior
+- Reduced-motion support in CSS, Framer Motion, and the custom cursor
 - Responsive, touch-friendly controls
 
 When adding components, test keyboard-only use, 200% zoom, screen-reader labels, contrast, and reduced-motion behavior.
@@ -935,7 +907,7 @@ The health route returns HTTP `503` when the database query fails.
 - [ ] Published article renders and unknown/draft article returns 404
 - [ ] Header and footer links work at mobile and desktop widths
 - [ ] Theme choice survives a reload
-- [ ] 3D scene does not prevent text selection or button interaction
+- [ ] Hero text and buttons render without client-side JavaScript
 - [ ] Reduced-motion mode removes nonessential motion
 
 #### Pricing and contact
@@ -1145,7 +1117,7 @@ These are recommendations, not current routes. Add them only when supported by r
 - **Content:** Concepts and verified projects are labeled; false testimonials are suppressed. Clarify pricing exclusions, support commitments, scope, currency, and actual audience. Keep response-time copy only if leads are actively monitored.
 - **SEO:** Per-route metadata, canonicals, Open Graph/Twitter, Organization/ProfessionalService/Article/FAQ JSON-LD, sitemap, and robots exist. Set the production origin; add truthful author/date/image data where available; check actual search intent and content depth. Sitemap should include only published posts.
 - **Accessibility:** Semantic landmarks, skip link, labels, focus styling, reduced motion, keyboard pricing tabs, and linked form errors exist. Complete mobile-dialog focus trapping/restoration and `aria-controls` relationships for tabs. Run axe, contrast, keyboard-only, and screen-reader tests; source review is not certification.
-- **Performance:** Server Components, client-only 3D fallback, `next/image`, cached public reads, ISR, and reduced-motion branches exist. Measure field Web Vitals/bundles on production; review observed font-preload and deprecated `THREE.Clock` warnings before changing behavior. No Lighthouse score was collected.
+- **Performance (historical audit):** Server Components, `next/image`, cached public reads and ISR exist. The 3D hero, its CSS fallback and their dependencies have since been removed. Measure field Web Vitals/bundles on production; no Lighthouse score was collected in the original audit.
 - **Security/privacy:** Parameterized Drizzle, HTTP-only signed admin cookie, validation, headers, and rate limits exist. This audit makes production admin auth fail closed, removes IPs from persisted rate-limit logs, and normalizes analytics referrers to origins. Remaining: sanitize proxy headers, use shared rate limiting at scale, add CSP when origins are known, review retention/legal obligations, and rotate credentials exposed outside a secret manager.
 - **Operations:** Leads persist but do not trigger email. Add notifications/monitoring and test restore procedures before relying on response SLAs. Add reviewed, versioned Drizzle migrations before frequent production schema changes.
 
@@ -1188,7 +1160,7 @@ These are recommendations, not current routes. Add them only when supported by r
 
 1. Run Lighthouse/Web Vitals, real mobile/tablet/browser checks, axe, keyboard-only, screen-reader, contrast, and 200% zoom tests on the deployed domain.
 2. Contain/restore focus in the mobile dialog and complete pricing-tab relationships; verify focus order and reduced-motion behavior.
-3. Review font preloads and Three.js warnings; measure before changing loading strategy or removing 3D.
+3. Review font preloads and measure Core Web Vitals after the 3D removal.
 4. Validate production canonicals, sitemap, structured data, alt text, robots, and security headers after setting the production origin.
 
 #### Phase 5 — Premium polish and advanced enhancements
@@ -1279,13 +1251,11 @@ Ensure the fine-grained token is authorized for that exact repository and grants
 
 Check token validity, repository access, organization authorization, and GitHub API rate limits. The importer logs failures in Admin → Activity but never exposes the token in browser responses.
 
-### 3D or animation performance is poor
+### Animation performance is poor
 
 - Test a production build rather than development mode.
-- Verify the browser is using hardware acceleration.
-- Reduce particle/panel counts in `src/components/hero3d.tsx`.
 - Test with reduced motion and mobile breakpoints.
-- Preserve the existing device-pixel-ratio and mobile complexity limits.
+- Profile any remaining interaction animations before reducing their complexity.
 
 ### Health endpoint reports 503
 

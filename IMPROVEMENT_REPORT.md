@@ -1,5 +1,7 @@
 # Webloom improvement handoff — 2026-10-19
 
+The initial handoff measurements and 3D description below are historical; the follow-up section records the current implementation.
+
 ## Implemented
 
 - Preserved the existing App Router pages, service descriptions, website tiers ($299 / $599 / $1,199), GitHub work, administration, PostgreSQL lead storage, and email-on-lead-decision integration.
@@ -24,3 +26,7 @@
 3. Legal pages are starter drafts. Have the business review/replace them before changing their `noindex` status; they are intentionally excluded from the sitemap.
 4. Full `npm audit` still finds advisories in development-only tooling (`eslint-config-next`/glob dependencies and `drizzle-kit`/esbuild); no available non-breaking fix at this time. Production dependency audit passes. Reassess as patched versions become available.
 5. The in-memory contact rate limiter is per server instance, not shared across serverless instances. For sustained traffic, add edge/WAF or shared rate limiting and verify the real form with a test lead. Submit the deployed sitemap to Search Console and configure any existing analytics/consent setup manually; no IDs or verification tokens were invented.
+
+## Follow-up: lightweight hero
+
+The WebGL/Three.js hero, animated CSS scene fallback and unused full-screen loader have been removed. The hero now renders as static HTML with the existing headline, supporting copy, decorative CSS background and both contact/work actions. All four Three.js-related packages were removed from the lockfile. No database schema, credentials, form delivery code or deployment settings were changed. In matching local production builds, total generated JS chunks fell from **1,841,782 to 915,418 bytes** (about 50% less); JS files referenced by the homepage HTML fell from **13 / 825,974 to 12 / 816,367 raw bytes**. Homepage HTML went from 262,317 to 265,345 bytes; this was not an HTML-size optimization. The homepage HTML contains no `<canvas>`, 3D fallback, or 3D loader reference. `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:smoke` (on port 3001), and `npm audit --omit=dev` all passed. These byte counts are raw local build artifacts, **not** real-user network transfer or Core Web Vitals. The existing database configuration has not been changed; live database-backed submissions were not exercised in this sandbox.
