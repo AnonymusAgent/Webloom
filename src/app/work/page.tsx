@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import Link from "next/link";
+import { pageSeo } from "@/lib/seo";
 import { BadgeCheck, Sparkle } from "lucide-react";
 import { PRODUCTS } from "@/lib/site";
 import { Button, Chip, Container } from "@/components/ui";
@@ -9,12 +10,7 @@ import { getGithubProjects } from "@/lib/data";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "Work — Verified Projects & Product Concepts",
-  description:
-    "Verified Webloom software projects alongside clearly labeled products and product concepts — with source-derived technology profiles and no fabricated client claims.",
-  alternates: { canonical: "/work" },
-};
+export const metadata = pageSeo("Work — Verified Projects & Product Concepts", "Verified Webloom software projects alongside clearly labeled products and product concepts — with source-derived technology profiles and no fabricated client claims.", "/work");
 
 export default async function WorkPage() {
   const githubProjects = await getGithubProjects();
@@ -148,7 +144,10 @@ export default async function WorkPage() {
                       <p className="text-sm italic leading-relaxed text-mut">“{p.outcome}”</p>
                     </div>
 
-                    <div className="mt-8">
+                    <div className="mt-8 flex flex-wrap gap-3">
+                      <Link href={`/work/${p.slug}`} className="inline-flex items-center rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-brandink transition-opacity hover:opacity-80">
+                        View {p.name} details
+                      </Link>
                       <Button
                         href={`/contact?ref=${p.slug}`}
                         variant="secondary"

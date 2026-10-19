@@ -60,7 +60,7 @@ export function PostsPanel() {
   }, []);
 
   useEffect(() => {
-    load().catch(() => setItems([]));
+    void Promise.resolve().then(load).catch(() => setItems([]));
   }, [load]);
 
   async function save() {
@@ -193,7 +193,7 @@ export function TestimonialsPanel() {
     setItems(data.items);
   }, []);
   useEffect(() => {
-    load().catch(() => setItems([]));
+    void Promise.resolve().then(load).catch(() => setItems([]));
   }, [load]);
 
   async function save() {
@@ -315,7 +315,7 @@ export function FaqsPanel() {
     setItems(data.items);
   }, []);
   useEffect(() => {
-    load().catch(() => setItems([]));
+    void Promise.resolve().then(load).catch(() => setItems([]));
   }, [load]);
 
   async function save() {

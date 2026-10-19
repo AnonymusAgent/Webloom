@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { MotionConfig } from "framer-motion";
 import Nav from "@/components/nav";
 import Footer from "@/components/footer";
 import type { SiteSettings } from "@/lib/data";
@@ -52,65 +51,6 @@ export function Tracker() {
   return null;
 }
 
-/* -------------------------------- cursor ----------------------------------- */
-
-function CustomCursor() {
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.matchMedia("(pointer: coarse)").matches) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const dot = document.createElement("div");
-    const ring = document.createElement("div");
-    dot.style.cssText =
-      "position:fixed;z-index:9999;width:6px;height:6px;border-radius:50%;background:var(--brand);pointer-events:none;top:0;left:0;transform:translate(-50%,-50%);";
-    ring.style.cssText =
-      "position:fixed;z-index:9998;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line2);pointer-events:none;top:0;left:0;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s,opacity .3s;";
-    document.body.append(dot, ring);
-
-    let tx = -100, ty = -100, rx = -100, ry = -100, raf = 0, visible = false;
-
-    const move = (e: globalThis.MouseEvent) => {
-      tx = e.clientX;
-      ty = e.clientY;
-      if (!visible) { visible = true; dot.style.opacity = "1"; ring.style.opacity = "1"; }
-      dot.style.transform = `translate(${tx - 3}px, ${ty - 3}px)`;
-      const interactive = (e.target as HTMLElement)?.closest?.("a,button,[role=button],input,select,textarea,label,[data-magnetic]");
-      if (interactive) {
-        ring.style.width = "52px";
-        ring.style.height = "52px";
-        ring.style.borderColor = "var(--brand)";
-      } else {
-        ring.style.width = "34px";
-        ring.style.height = "34px";
-        ring.style.borderColor = "var(--line2)";
-      }
-    };
-
-    const loop = () => {
-      rx += (tx - rx) * 0.16;
-      ry += (ty - ry) * 0.16;
-      ring.style.transform = `translate(${rx - 17}px, ${ry - 17}px)`;
-      raf = requestAnimationFrame(loop);
-    };
-
-    const leave = () => { dot.style.opacity = "0"; ring.style.opacity = "0"; visible = false; };
-
-    dot.style.opacity = "0"; ring.style.opacity = "0";
-    window.addEventListener("mousemove", move, { passive: true });
-    document.documentElement.addEventListener("mouseleave", leave);
-    raf = requestAnimationFrame(loop);
-    return () => {
-      window.removeEventListener("mousemove", move);
-      document.documentElement.removeEventListener("mouseleave", leave);
-      cancelAnimationFrame(raf);
-      dot.remove();
-      ring.remove();
-    };
-  }, []);
-  return null;
-}
-
 /* --------------------------------- chrome ---------------------------------- */
 
 export default function Chrome({
@@ -127,29 +67,40 @@ export default function Chrome({
   useEffect(() => {
     if (isAdmin) return;
     const controller = new AbortController();
-    const timer = window.setTimeout(() => {
+    const refreshSettings = () => {
       fetch("/api/site-settings", { signal: controller.signal })
         .then((response) => (response.ok ? response.json() : null))
         .then((value) => {
           if (value?.contactEmail && Array.isArray(value.socials)) {
-            setPublicSettings(value);
+            setPublicSettings((current) => {
+              const sameSocials = current.socials.length === value.socials.length &&
+                current.socials.every((social, index) =>
+                  social.label === value.socials[index]?.label && social.href === value.socials[index]?.href
+                );
+              return current.contactEmail === value.contactEmail && sameSocials ? current : value;
+            });
           }
         })
         .catch(() => {});
-    }, 50);
+    };
+    // Contact details stay in the initial HTML; refresh admin-managed settings when idle.
+    const idle = "requestIdleCallback" in window
+      ? window.requestIdleCallback(refreshSettings, { timeout: 2_000 })
+      : undefined;
+    const timer = idle === undefined ? setTimeout(refreshSettings, 1_200) : undefined;
     return () => {
-      window.clearTimeout(timer);
+      if (idle !== undefined) window.cancelIdleCallback(idle);
+      if (timer !== undefined) clearTimeout(timer);
       controller.abort();
     };
   }, [isAdmin]);
 
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       <Tracker />
-      <CustomCursor />
       {!isAdmin && <Nav />}
       <main id="main">{children}</main>
       {!isAdmin && <Footer settings={publicSettings} />}
-    </MotionConfig>
+    </>
   );
 }

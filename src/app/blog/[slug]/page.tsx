@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -7,6 +8,7 @@ import { Reveal } from "@/components/motion";
 import { formatDate } from "@/lib/utils";
 import { getPostBySlug, getPosts } from "@/lib/data";
 import { SITE } from "@/lib/site";
+import { pageSeo } from "@/lib/seo";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -23,12 +25,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-  if (!post || !post.published) return { title: "Article not found" };
+  if (!post || !post.published) notFound();
+  const seo = pageSeo(post.title, post.excerpt, `/blog/${post.slug}`);
   return {
-    title: post.title,
-    description: post.excerpt,
-    alternates: { canonical: `/blog/${post.slug}` },
-    openGraph: { title: post.title, description: post.excerpt, type: "article" },
+    ...seo,
+    openGraph: {
+      ...seo.openGraph,
+      type: "article",
+      publishedTime: post.createdAt.toISOString(),
+    },
   };
 }
 
@@ -111,7 +116,7 @@ export default async function ArticlePage({
     <article className="relative overflow-hidden pt-40 pb-24 md:pt-52 md:pb-32">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(articleSchema) }}
       />
       <div aria-hidden="true" className="absolute inset-0" style={{ background: "var(--halo)" }} />
       <Container className="relative">

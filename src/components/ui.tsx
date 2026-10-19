@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Magnetic } from "@/components/motion";
 
 /* ---------------------------------- logo ----------------------------------- */
 
@@ -23,6 +22,7 @@ export function Logo({ href = "/", className }: { href?: string; className?: str
   return (
     <Link
       href={href}
+      prefetch={false}
       aria-label="Webloom — home"
       className={cn("group inline-flex items-center gap-2.5", className)}
     >
@@ -97,6 +97,7 @@ export function Button({
   const content = href ? (
     <Link
       href={href}
+      prefetch={false}
       data-track={track}
       className={base}
       target={external ? "_blank" : undefined}
@@ -110,7 +111,7 @@ export function Button({
     </button>
   );
 
-  return variant === "primary" ? <Magnetic strength={0.2}>{content}</Magnetic> : content;
+  return content;
 }
 
 /* ------------------------------ section header ----------------------------- */

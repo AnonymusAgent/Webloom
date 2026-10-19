@@ -11,7 +11,7 @@ export default function TestimonialsSection({ items }: { items: Testimonial[] })
       <Container>
         <Reveal>
           <SectionHead
-            index="09"
+            index="07"
             kicker="Testimonials"
             title={<span id="testimonials-h">What clients say.</span>}
           />

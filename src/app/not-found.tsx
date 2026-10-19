@@ -18,7 +18,6 @@ export default function NotFound() {
               width: s,
               height: s,
               opacity: 0.85 - i * 0.25,
-              animation: `floaty ${7 + i * 1.3}s ease-in-out ${i * 0.6}s infinite`,
             }}
           />
         ))}
@@ -32,7 +31,7 @@ export default function NotFound() {
       </div>
 
       <Container className="relative flex flex-col items-center">
-        <LogoMark className="h-12 w-12 animate-spin-slower" />
+        <LogoMark className="h-12 w-12" />
         <p className="kicker mt-8">404</p>
         <h1 className="mt-4 max-w-xl text-balance text-[clamp(2rem,5vw,3.6rem)] font-semibold leading-[1.06] tracking-[-0.02em]">
           Looks like this page hasn&apos;t bloomed yet.

@@ -3,9 +3,9 @@
 Complete inventory of the exported project. This package contains **100% of the source code required to reproduce the running application** once environment variables are configured.
 
 **Export date:** 2026-08-24
-**Framework:** Next.js 16.2 (App Router, Turbopack) · React 19 · TypeScript 5.9
+**Framework:** Next.js 16.4 (App Router, Turbopack) · React 19 · TypeScript 5.9
 **Database:** PostgreSQL (Neon) via Drizzle ORM
-**UI:** Tailwind CSS 4 · Framer Motion 13 · Three.js / React Three Fiber
+**UI:** Tailwind CSS 4 · Framer Motion 13
 
 ---
 
@@ -47,14 +47,12 @@ webloom/
 │   ├── components/                   # All React components (24 files)
 │   │   ├── admin/                    # Admin shell, panels, GitHub importer
 │   │   ├── blog/                     # Blog search/filter
-│   │   ├── home/                     # 13 homepage sections + hero
+│   │   ├── home/                     # Focused homepage sections + hero
 │   │   ├── pricing/                  # Pricing tabs + estimator
-│   │   ├── chrome.tsx                # Nav/footer shell, tracker, cursor
+│   │   ├── chrome.tsx                # Nav/footer shell, tracker
 │   │   ├── contact-form.tsx          # Validated project-brief form
 │   │   ├── faq.tsx                   # Accessible accordion + FAQ JSON-LD
 │   │   ├── github-work-section.tsx   # Verified projects + archive
-│   │   ├── hero3d.tsx                # Three.js hero scene (lazy, adaptive)
-│   │   ├── software-loader.tsx       # Loading animation component
 │   │   └── ...                       # nav, footer, motion, theme, ui, tier-card
 │   ├── db/
 │   │   ├── index.ts                  # Bounded PostgreSQL pool + Drizzle client
@@ -90,7 +88,7 @@ webloom/
 
 | Route | Type | Purpose |
 |---|---|---|
-| `/` | ISR (5 min) | Homepage: hero + 3D, services, products, verified work, process, tech, pricing, FAQ, CTA |
+| `/` | ISR (5 min) | Homepage: static hero, services, work, process, pricing, FAQ, CTA |
 | `/services` | Static | Six service detail blocks + technology overview |
 | `/work` | ISR (5 min) | Source-verified GitHub projects (8 featured + 9 archive) + product concepts |
 | `/pricing` | ISR (5 min) | Interactive pricing tabs, estimator, FAQ accordion |
@@ -148,10 +146,9 @@ All are documented in `.env.example`. `NODE_ENV` is framework-managed.
 
 ## 6. Features included (audit-verified)
 
-- ✅ Interactive Three.js hero (lazy-loaded, mobile-adaptive, reduced-motion aware)
-- ✅ CSS software loading animation + hero scene fallback
+- ✅ Server-rendered homepage hero with no 3D engine or animated fallback
 - ✅ Dark/light theme with persistence + no-flash script
-- ✅ Page transitions, scroll reveals, magnetic buttons, custom cursor
+- ✅ Native FAQ disclosures, static server-rendered sections, and CSS hover feedback
 - ✅ Pricing tabs (keyboard accessible) + live project estimator
 - ✅ Contact form: client+server validation, loading/success/error states, rate limiting
 - ✅ Admin: overview analytics, leads pipeline, blog/testimonial/FAQ CRUD, GitHub importer, settings, activity logs

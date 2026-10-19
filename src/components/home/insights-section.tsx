@@ -16,7 +16,7 @@ export default function InsightsSection({ posts }: { posts: Post[] }) {
         <div className="flex flex-wrap items-end justify-between gap-8">
           <Reveal>
             <SectionHead
-              index="10"
+              index="08"
               kicker="Insights"
               title={<span id="insights-h">Notes on building products.</span>}
             />

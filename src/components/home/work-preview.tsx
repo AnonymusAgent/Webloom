@@ -11,7 +11,7 @@ export default function WorkPreview() {
         <div className="flex flex-wrap items-end justify-between gap-8">
           <Reveal>
             <SectionHead
-              index="05"
+              index="04"
               kicker="Selected work"
               title={<span id="work-h">Selected product concepts.</span>}
               lead="A closer look at the kind of products Webloom designs and builds. Labeled honestly — concepts and Webloom products, not fabricated client claims."
@@ -35,7 +35,8 @@ export default function WorkPreview() {
           {PRODUCTS.map((p, i) => (
             <Reveal key={p.slug} delay={i * 0.05} y={16}>
               <Link
-                href={`/work#${p.slug}`}
+                href={`/work/${p.slug}`}
+                prefetch={false}
                 data-track={`work_row_${p.slug}`}
                 className="group relative flex items-center gap-5 overflow-hidden py-7 transition-all duration-500 sm:gap-8 sm:py-9"
               >

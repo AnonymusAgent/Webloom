@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
+import { pageSeo } from "@/lib/seo";
 import { Compass, Eye, Gem, Layers, Target } from "lucide-react";
 import { Container } from "@/components/ui";
 import { Reveal } from "@/components/motion";
 import FinalCta from "@/components/home/final-cta";
 import { PROCESS, WHY } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "About — Strategy + Design + Technology",
-  description:
-    "Webloom turns ambitious ideas into useful digital products. Simple on the surface, powerful underneath — our philosophy, approach and values.",
-  alternates: { canonical: "/about" },
-};
+export const metadata = pageSeo("About — Strategy + Design + Technology", "Webloom turns ambitious ideas into useful digital products. Simple on the surface, powerful underneath — our philosophy, approach and values.", "/about");
 
 const PILLARS = [
   {

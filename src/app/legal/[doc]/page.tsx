@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageSeo } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { LEGAL } from "@/lib/site";
 import { Container } from "@/components/ui";
@@ -16,11 +17,8 @@ export async function generateMetadata({
   const { doc } = await params;
   const entry = LEGAL[doc];
   if (!entry) return { title: "Not found" };
-  return {
-    title: entry.title,
-    description: entry.intro,
-    alternates: { canonical: `/legal/${doc}` },
-  };
+  // These are explicitly marked as legal drafts; keep them accessible but out of the index.
+  return { ...pageSeo(entry.title, entry.intro, `/legal/${doc}`), robots: { index: false, follow: true } };
 }
 
 export default async function LegalPage({
