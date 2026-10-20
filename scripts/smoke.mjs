@@ -23,6 +23,12 @@ for (const path of pages) {
   const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
   assert.equal(canonical, site + (path === "/" ? "" : path), `${path} needs a canonical`);
   assert.equal(html.includes('name="robots" content="noindex'), path.startsWith("/legal/"), `${path} robots mismatch`);
+  if (path === "/work" || path.startsWith("/work/")) {
+    const slugs = path === "/work" ? ["bloom-pos", "noor", "pulse", "clarity-health"] : [path.split("/")[2]];
+    for (const slug of slugs) {
+      assert.ok(html.includes(encodeURIComponent(`/images/projects/${slug}-concept.jpg`)), `${path} should render ${slug} artwork`);
+    }
+  }
   if (path === "/") {
     assert.ok(!html.includes("<canvas") && !html.includes("hero-scene-fallback"), "Homepage should not render a 3D scene");
     assert.ok(html.includes('href="#services"') && html.includes('href="/pricing#faq"'), "Homepage section and FAQ links should work");
@@ -37,7 +43,7 @@ const arArtwork = await fetch(new URL("/images/projects/ar-manager.svg", base));
 assert.equal(arArtwork.status, 200, "Source-informed AR Manager artwork should be available");
 assert.match(arArtwork.headers.get("content-type") || "", /image\/svg\+xml/);
 assert.match(await arArtwork.text(), /NOT A LIVE SCREENSHOT/);
-for (const name of ["type-arena", "la-maison-restaurant"]) {
+for (const name of ["type-arena", "la-maison-restaurant", "bloom-pos-concept", "noor-concept", "pulse-concept", "clarity-health-concept"]) {
   const artwork = await fetch(new URL(`/images/projects/${name}.jpg`, base));
   assert.equal(artwork.status, 200, `${name} portfolio artwork should be available`);
   assert.match(artwork.headers.get("content-type") || "", /image\/jpeg/);
