@@ -174,6 +174,17 @@ function ArchiveProject({ project, index }: { project: GithubProject; index: num
             ))}
           </div>
         )}
+        {project.homepage && (
+          <a
+            href={project.homepage}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track={`github_demo_${project.slug}`}
+            className="mt-5 inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-medium text-brand hover:underline"
+          >
+            View live product <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          </a>
+        )}
       </article>
     </Reveal>
   );

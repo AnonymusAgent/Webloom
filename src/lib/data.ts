@@ -13,6 +13,7 @@ import {
   testimonials,
 } from "@/db/schema";
 import { FAQS, SITE } from "@/lib/site";
+import { liveProjectUrl } from "@/lib/live-projects";
 
 /* ------------------------------- settings -------------------------------- */
 
@@ -211,6 +212,9 @@ export async function getGithubProjects(publishedOnly = true) {
   const rows = await getCachedGithubProjects(publishedOnly);
   return rows.map((row) => ({
     ...row,
+    // The seed is insert-only and older imports may have no homepage. Keep the
+    // two explicitly verified public deployments in sync on every public card.
+    homepage: liveProjectUrl(row.repo) ?? row.homepage,
     image: row.image || PROJECT_COVERS[row.repo.toLowerCase()] || null,
     // The older seed misidentified this public TypeScript medical-billing app as
     // a C# desktop asset manager. Correct legacy rows at read time without
