@@ -542,10 +542,11 @@ The current Webloom deployment contains a source-audited catalogue from `github.
 | Archive | `Wifi` | Alternative static network-command dashboard iteration |
 | Archive | `MyBet` | Sports/casino interface concept; not represented as a live wagering service |
 | Archive | `Web-App` | Prompt-led app-builder interface concept; not represented as an active generation backend |
+| Archive | `type-arena` | Competitive typing-game web platform with races, tests, practice, progression and leaderboards |
 | Archive | `Restaurant-Web` | Responsive multi-page hospitality website concept; concept awards are not presented as Webloom claims |
 | Excluded | `AnonymusAgent` | GitHub profile README only; not a software project |
 
-Original portfolio covers are stored under `public/images/projects/`. They are product visualizations based on verified domain/features—not screenshots and not evidence of external client work.
+Original portfolio covers are stored under `public/images/projects/`. They are product visualizations based on verified domain/features—not screenshots and not evidence of external client work. Type Arena and La Maison Restaurant have illustrative 16:9 covers; published archive cards now display available covers. Existing database rows without an image receive the corresponding cover at read time without reseeding, while custom images remain intact.
 
 #### Blog
 

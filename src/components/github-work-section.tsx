@@ -130,6 +130,17 @@ function ArchiveProject({ project, index }: { project: GithubProject; index: num
   return (
     <Reveal delay={(index % 2) * 0.06} y={16}>
       <article className="group flex h-full flex-col rounded-2xl border border-line p-5 transition-all duration-400 hover:-translate-y-1 hover:border-line2 hover:bg-card">
+        {project.image && (
+          <div className="relative mb-5 aspect-[16/9] overflow-hidden rounded-xl border border-line bg-elev">
+            <Image
+              src={project.image}
+              alt={`${project.name} illustrative portfolio cover`}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
+            />
+          </div>
+        )}
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="font-mono text-[0.6rem] tracking-[0.16em] text-brand uppercase">{project.category}</p>
