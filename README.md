@@ -546,6 +546,8 @@ The current Webloom deployment contains a source-audited catalogue from `github.
 | Archive | `Restaurant-Web` | Responsive multi-page hospitality website concept; concept awards are not presented as Webloom claims |
 | Excluded | `AnonymusAgent` | GitHub profile README only; not a software project |
 
+The verified Type Arena and AR Manager deployments are linked from their public GitHub project cards (homepage and Work page) and the footer’s **Live projects** links. Type Arena opens its playable home page; AR Manager opens its sign-in page. The URLs are applied when reading existing project records, so older insert-only seed data does not need a database migration. External links open in a new tab with `noopener noreferrer`.
+
 Original portfolio covers are stored under `public/images/projects/`. They are product visualizations based on verified domain/features—not screenshots and not evidence of external client work. Type Arena and La Maison Restaurant have illustrative 16:9 covers; published archive cards now display available covers. Existing database rows without an image receive the corresponding cover at read time without reseeding, while custom images remain intact. The four Webloom product/product-concept entries (BloomPOS, Noor, Pulse and Clarity Health) likewise use clearly labeled illustrative artwork on `/work` and their individual detail pages. These covers depict the product direction, not released-app captures, real patient data, or evidence of delivered client work.
 
 #### Blog

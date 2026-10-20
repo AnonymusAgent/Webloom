@@ -29,6 +29,12 @@ for (const path of pages) {
       assert.ok(html.includes(encodeURIComponent(`/images/projects/${slug}-concept.jpg`)), `${path} should render ${slug} artwork`);
     }
   }
+  for (const [name, href] of [
+    ["Type Arena", "https://type-arena-silk.vercel.app/"],
+    ["AR Manager", "https://ar-manager-ten.vercel.app/login"],
+  ]) {
+    assert.ok(html.includes(`href="${href}"`), `${path} footer should link to ${name} live site`);
+  }
   if (path === "/") {
     assert.ok(!html.includes("<canvas") && !html.includes("hero-scene-fallback"), "Homepage should not render a 3D scene");
     assert.ok(html.includes('href="#services"') && html.includes('href="/pricing#faq"'), "Homepage section and FAQ links should work");

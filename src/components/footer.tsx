@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { Container, LogoMark } from "@/components/ui";
 import { Reveal } from "@/components/motion";
+import { LIVE_PROJECTS } from "@/lib/live-projects";
 import type { SiteSettings } from "@/lib/data";
 
 function SocialIcon({ label, className }: { label: string; className?: string }) {
@@ -118,6 +120,27 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
                     </li>
                   ))}
                 </ul>
+                {col.title === "Resources" && (
+                  <>
+                    <h4 className="kicker mb-4 mt-8 text-[0.62rem]">Live projects</h4>
+                    <ul className="space-y-3">
+                      {LIVE_PROJECTS.map((project) => (
+                        <li key={project.repo}>
+                          <a
+                            href={project.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-track={`footer_live_${project.repo}`}
+                            aria-label={`Visit ${project.name} live website (opens in a new tab)`}
+                            className="inline-flex items-center gap-1.5 text-sm text-mut transition-colors hover:text-brand"
+                          >
+                            {project.name} <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </nav>
             </Reveal>
           ))}
