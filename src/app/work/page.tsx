@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { pageSeo } from "@/lib/seo";
 import { BadgeCheck, Sparkle } from "lucide-react";
 import { PRODUCTS } from "@/lib/site";
@@ -62,39 +63,26 @@ export default async function WorkPage() {
                 className="card-surface group scroll-mt-32 overflow-hidden rounded-[2rem]"
               >
                 <div className="grid lg:grid-cols-[1fr_1.15fr]">
-                  {/* art side */}
-                  <div
-                    className="relative min-h-64 overflow-hidden lg:min-h-full"
-                    style={{
-                      background: `linear-gradient(150deg, color-mix(in oklab, var(--brand) 14%, var(--bg2)), var(--bg2) 60%)`,
-                      filter: `hue-rotate(${p.hue === "160deg" ? "0deg" : p.hue})`,
-                    }}
-                  >
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 opacity-40"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
-                        backgroundSize: "40px 40px",
-                      }}
+                  {/* Source-informed concept illustration; not a product screenshot. */}
+                  <div className="relative min-h-64 overflow-hidden bg-elev lg:min-h-full">
+                    <Image
+                      src={p.image}
+                      alt={`${p.name} illustrative product artwork, not a screenshot`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 45vw"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center p-10">
-                      <div className="relative flex h-28 w-28 items-center justify-center rounded-[2rem] border border-line2 bg-elev/70 shadow-soft backdrop-blur-md transition-transform duration-700 group-hover:rotate-6 group-hover:scale-105 sm:h-32 sm:w-32">
-                        <p.icon className="h-12 w-12 text-brand" strokeWidth={1.3} />
-                        <span className="ring-bloom" aria-hidden="true" />
-                      </div>
-                    </div>
-                    <div className="absolute left-6 top-6 flex gap-2">
-                      <Chip className="border-brand/30 bg-bg/60 text-brand backdrop-blur-sm">
+                    <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20" />
+                    <div className="absolute left-6 top-6">
+                      <Chip className="border-white/20 bg-black/60 text-white backdrop-blur-sm">
                         <Sparkle className="h-3 w-3" />
                         {p.label}
                       </Chip>
                     </div>
-                    <span
-                      aria-hidden="true"
-                      className="absolute bottom-4 right-6 font-mono text-6xl font-bold text-ink/[0.05]"
-                    >
+                    <span className="absolute bottom-5 left-6 font-mono text-[0.65rem] tracking-[0.12em] text-white/80 uppercase">
+                      Illustrative artwork
+                    </span>
+                    <span aria-hidden="true" className="absolute bottom-4 right-6 font-mono text-5xl font-bold text-white/35">
                       0{i + 1}
                     </span>
                   </div>

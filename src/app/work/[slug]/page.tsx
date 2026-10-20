@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { PRODUCTS } from "@/lib/site";
@@ -49,11 +50,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 <Button href="/services" variant="secondary">Explore our services</Button>
               </div>
             </div>
-            <div className="relative flex min-h-64 items-center justify-center overflow-hidden rounded-[2rem] border border-line bg-card sm:min-h-80" aria-hidden="true">
-              <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-              <div className="relative flex h-32 w-32 items-center justify-center rounded-[2rem] border border-line2 bg-elev shadow-soft">
-                <product.icon className="h-14 w-14 text-brand" strokeWidth={1.4} />
-              </div>
+            <div className="relative min-h-64 overflow-hidden rounded-[2rem] border border-line bg-card sm:min-h-80">
+              <Image
+                src={product.image}
+                alt={`${product.name} illustrative product artwork, not a screenshot`}
+                fill
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                className="object-cover"
+              />
+              <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <span className="absolute bottom-5 left-6 font-mono text-[0.65rem] tracking-[0.12em] text-white uppercase">
+                Illustrative artwork
+              </span>
             </div>
           </div>
         </Container>

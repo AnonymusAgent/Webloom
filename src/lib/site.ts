@@ -90,7 +90,7 @@ export type Product = {
   tech: string[];
   outcome: string;
   icon: LucideIcon;
-  hue: string; // accent tint used for card art
+  image: string; // illustrative cover, not a product screenshot
 };
 
 export type Tier = {
@@ -243,7 +243,7 @@ export const PRODUCTS: Product[] = [
     tech: ["Next.js", "PostgreSQL", "Offline sync", "Thermal printing"],
     outcome: "One system replacing spreadsheets, paper invoices and guesswork.",
     icon: ShoppingCart,
-    hue: "160deg",
+    image: "/images/projects/bloom-pos-concept.jpg",
   },
   {
     slug: "noor",
@@ -267,7 +267,7 @@ export const PRODUCTS: Product[] = [
     tech: ["React Native", "Audio streaming", "Offline-first", "RTL design"],
     outcome: "A calm, reliable companion app for daily reading and learning.",
     icon: Moon,
-    hue: "200deg",
+    image: "/images/projects/noor-concept.jpg",
   },
   {
     slug: "pulse",
@@ -287,7 +287,7 @@ export const PRODUCTS: Product[] = [
     tech: ["Desktop app", "System APIs", "Real-time charts"],
     outcome: "Technician-grade diagnostics wrapped in an interface anyone can read.",
     icon: Cpu,
-    hue: "45deg",
+    image: "/images/projects/pulse-concept.jpg",
   },
   {
     slug: "clarity-health",
@@ -307,7 +307,7 @@ export const PRODUCTS: Product[] = [
     tech: ["Web platform", "PostgreSQL", "Role-based access", "Audit trails"],
     outcome: "Less time on paperwork, more time on patients.",
     icon: Stethoscope,
-    hue: "280deg",
+    image: "/images/projects/clarity-health-concept.jpg",
   },
 ];
 
