@@ -8,6 +8,7 @@ import WorkPreview from "@/components/home/work-preview";
 import GithubWorkPreview from "@/components/home/github-work-preview";
 import ProcessSection from "@/components/home/process-section";
 import PricingPreview from "@/components/home/pricing-preview";
+import TechSection from "@/components/home/tech-section";
 import ImproveSection from "@/components/improve-section";
 import TestimonialsSection from "@/components/home/testimonials-section";
 import InsightsSection from "@/components/home/insights-section";
@@ -52,7 +53,7 @@ async function Questions() {
           <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
             <Reveal className="lg:sticky lg:top-32 lg:self-start">
               <SectionHead
-                index="09"
+                index="10"
                 kicker="FAQ"
                 title={<span id="faq-h">Questions, answered.</span>}
                 lead="Everything most people want to know before starting a project with Webloom."
@@ -84,6 +85,7 @@ export default function Home() {
       <Suspense fallback={null}><VerifiedWork /></Suspense>
       <WorkPreview />
       <ProcessSection />
+      <TechSection />
       <PricingPreview />
       <ImproveSection />
       <Suspense fallback={null}><PublishedContent /></Suspense>

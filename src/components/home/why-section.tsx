@@ -8,7 +8,7 @@ export default function WhySection() {
       <Container>
         <Reveal>
           <p className="kicker mb-5 flex items-center gap-3">
-            <span className="text-mut">03</span>
+            <span className="text-mut">02</span>
             <span className="inline-block h-px w-8 bg-brand/60" aria-hidden="true" />
             Why Webloom
           </p>

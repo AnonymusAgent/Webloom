@@ -204,6 +204,20 @@ export async function getGithubProjects(publishedOnly = true) {
   const rows = await getCachedGithubProjects(publishedOnly);
   return rows.map((row) => ({
     ...row,
+    // The older seed misidentified this public TypeScript medical-billing app as
+    // a C# desktop asset manager. Correct legacy rows at read time without
+    // requiring a database migration or overriding later admin edits.
+    ...(row.repo === "AR-Manager" ? {
+      image: !row.image || row.image === "/images/projects/ar-manager.jpg"
+        ? "/images/projects/ar-manager.svg" : row.image,
+      category: row.category === "Desktop Application" ? "Medical Billing AR Platform" : row.category,
+      summary: row.summary.includes("desktop resource/asset management")
+        ? "A Next.js accounts-receivable workspace for medical billing, with claims review, denials, payments, authorizations, reporting and role-based workflows."
+        : row.summary,
+      language: row.language === "C#" ? "TypeScript" : row.language,
+      technologies: Array.isArray(row.technologies) && row.technologies.includes("C#")
+        ? ["Next.js", "React", "TypeScript", "PostgreSQL", "Drizzle ORM"] : row.technologies,
+    } : {}),
     pushedAt: row.pushedAt ? asDate(row.pushedAt as Date | string) : null,
     fetchedAt: asDate(row.fetchedAt as Date | string),
     createdAt: asDate(row.createdAt as Date | string),

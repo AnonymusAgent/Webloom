@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container, LogoMark } from "@/components/ui";
+import { Reveal } from "@/components/motion";
 import type { SiteSettings } from "@/lib/data";
 
 function SocialIcon({ label, className }: { label: string; className?: string }) {
@@ -62,7 +63,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
       />
       <Container className="relative py-16 md:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
-          <div>
+          <Reveal>
             <Link href="/" className="group inline-flex items-center gap-2.5" aria-label="Webloom home">
               <LogoMark className="h-7 w-7 transition-transform duration-700 group-hover:rotate-[120deg]" />
               <span className="text-xl font-semibold tracking-tight">Webloom</span>
@@ -94,40 +95,42 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
                 ))}
               </div>
             )}
-          </div>
+          </Reveal>
 
           {[
             { title: "Company", links: COMPANY },
             { title: "Services", links: SERVICES_LINKS },
             { title: "Resources", links: RESOURCES },
             { title: "Legal", links: LEGAL_LINKS },
-          ].map((col) => (
-            <nav key={col.title} aria-label={col.title}>
-              <h3 className="kicker mb-5 text-[0.66rem]">{col.title}</h3>
-              <ul className="space-y-3">
-                {col.links.map((l) => (
-                  <li key={l.href + l.label}>
-                    <Link
-                      href={l.href}
-                      className="text-sm text-mut transition-colors duration-200 hover:text-ink"
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+          ].map((col, index) => (
+            <Reveal key={col.title} delay={0.05 * index}>
+              <nav aria-label={col.title}>
+                <h3 className="kicker mb-5 text-[0.66rem]">{col.title}</h3>
+                <ul className="space-y-3">
+                  {col.links.map((l) => (
+                    <li key={l.href + l.label}>
+                      <Link
+                        href={l.href}
+                        className="text-sm text-mut transition-colors duration-200 hover:text-ink"
+                      >
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </Reveal>
           ))}
         </div>
 
-        <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-line pt-8 sm:flex-row sm:items-center">
+        <Reveal className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-line pt-8 sm:flex-row sm:items-center">
           <p className="text-xs text-mut">
             © {new Date().getFullYear()} Webloom. All rights reserved.
           </p>
           <p className="font-mono text-[0.68rem] tracking-[0.18em] text-mut uppercase">
             Idea → Design → Build → Launch → Grow
           </p>
-        </div>
+        </Reveal>
       </Container>
     </footer>
   );

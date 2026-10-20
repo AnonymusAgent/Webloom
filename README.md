@@ -45,9 +45,9 @@ The application includes a public marketing website, interactive pricing and pro
 
 - Premium dark-first visual system with a persistent light mode
 - Responsive sticky navigation and full-screen mobile menu
-- Lightweight, server-rendered hero with no WebGL, external imagery, or animation dependency
+- Server-rendered hero with a five-step workflow and brief CSS entrance; no WebGL or continuous animation
 - `prefers-reduced-motion` support throughout the site
-- Focused homepage: services, selected work, process, pricing, FAQ, and conversion sections; full product and technology details remain on Work and Services
+- Focused homepage: services, selected work, process, technology, pricing, FAQ, and conversion sections; full product and technology details remain on Work and Services
 - Dedicated Services, Work, Pricing, About, Contact, Blog, and Legal pages
 - Source-verified GitHub project portfolio with eight original product covers and a supporting repository archive
 - Honest project labels: **Source verified**, **Webloom Product**, or **Product Concept**
@@ -175,7 +175,7 @@ This split keeps brand-critical layout content version-controlled while allowing
 │   │   ├── faq.tsx
 │   │   ├── footer.tsx
 │   │   ├── github-work-section.tsx  # Published source-verified project cards
-│   │   ├── motion.tsx               # Static reveal wrapper and easing token
+│   │   ├── motion.tsx               # Progressive scroll reveal and easing token
 │   │   ├── nav.tsx
 │   │   ├── theme.tsx
 │   │   ├── tier-card.tsx
@@ -783,11 +783,11 @@ Before launch:
 
 ### Motion
 
-- The homepage hero is server-rendered and does not load a WebGL engine, 3D scene, or animated fallback.
-- Framer Motion is used only by route-specific interactive components such as pricing tabs and the contact form. FAQ disclosures use native HTML without hydration.
-- CSS transitions and `prefers-reduced-motion` support remain throughout the site.
-
-The shared static wrapper and easing token live in `src/components/motion.tsx`. The homepage uses no WebGL, custom cursor, or always-running visual animation.
+- The hero is server-rendered with a brief CSS entrance and a static five-step workflow; it does not load a WebGL engine or animated fallback. Its headline and actions stay readable from the first paint.
+- `src/components/motion.tsx` restores one-time Framer Motion reveals for section content. Server HTML stays visible; after hydration only off-screen content is prepared for a short scroll reveal. Reduced-motion visitors keep static content, and mobile uses the same restrained effect without a heavy 3D scene.
+- The root main reserves at least one viewport in normal flow: while Next.js streams the route loading boundary, the footer follows main instead of jumping into the first screen.
+- The technology section restores all ten existing stack categories as static, scroll-revealed cards instead of an always-running radial map. FAQ disclosures remain native HTML controls. Cards have small hover depth on fine-pointer devices only; there is no custom cursor, WebGL, scroll hijacking, or continuous animation.
+- The AR Manager portfolio image is a **source-informed interface illustration, not a screenshot**. It reflects the public TypeScript/Next.js medical-billing repository's dashboard and claims routes, and shows no actual patient data. Older seeded rows are corrected at read time without changing the database setup; administrators can still customize fields.
 
 ---
 
