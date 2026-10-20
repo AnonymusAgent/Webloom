@@ -63,6 +63,13 @@ html.dark {
   color-scheme: dark;
 }
 
+/* The root loading boundary can stream the shell before route content. Reserve
+   the viewport in normal flow so the footer follows the loading main instead
+   of appearing in the first screen and jumping down on hydration. */
+#main {
+  min-height: 100svh;
+}
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -147,6 +154,29 @@ body {
     display: none;
   }
 
+}
+
+/* First-paint hero motion never makes the headline or CTA invisible. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes hero-arrive {
+    from { opacity: 0.86; transform: translate3d(0, 10px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+  .hero-enter {
+    animation: hero-arrive 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--entrance-delay, 0ms);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  /* A small, bounded depth cue for cards; no cursor tracking or render loop. */
+  .card-surface:hover {
+    transform: perspective(1100px) translateY(-4px) rotateX(1deg);
+  }
+  .card-surface:focus-within {
+    border-color: var(--brand);
+    box-shadow: var(--shadow);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

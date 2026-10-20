@@ -38,7 +38,7 @@ webloom/
 │   │   ├── globals.css               # Design tokens, themes, loader CSS
 │   │   ├── icon.svg                  # Favicon / app icon
 │   │   ├── layout.tsx                # Root layout, fonts, SEO, theme script
-│   │   ├── loading.tsx               # Software loading animation boundary
+│   │   ├── loading.tsx               # Brief route loading boundary
 │   │   ├── not-found.tsx             # Custom 404
 │   │   ├── page.tsx                  # Homepage
 │   │   ├── robots.ts                 # robots.txt generation

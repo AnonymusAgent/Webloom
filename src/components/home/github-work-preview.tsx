@@ -52,7 +52,7 @@ export default function GithubWorkPreview({ projects }: { projects: GithubProjec
                     {project.image ? (
                       <Image
                         src={project.image}
-                        alt={`${project.name} product visualization`}
+                        alt={project.repo === "AR-Manager" ? "AR Manager source-informed dashboard illustration, not a live screenshot" : `${project.name} product visualization`}
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
                         className="object-cover transition-transform duration-700 group-hover/card:scale-[1.04]"

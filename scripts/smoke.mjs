@@ -26,12 +26,17 @@ for (const path of pages) {
   if (path === "/") {
     assert.ok(!html.includes("<canvas") && !html.includes("hero-scene-fallback"), "Homepage should not render a 3D scene");
     assert.ok(html.includes('href="#services"') && html.includes('href="/pricing#faq"'), "Homepage section and FAQ links should work");
+    assert.ok(html.includes('aria-label="Our workflow"') && html.includes('id="tech-h"'), "Homepage workflow and technology should render in initial HTML");
     for (const slug of ["bloom-pos", "noor", "pulse", "clarity-health"]) {
       assert.ok(html.includes(`href="/work/${slug}"`), `Homepage should link to ${slug}`);
     }
   }
   console.log(`${res.status} ${path}`);
 }
+const arArtwork = await fetch(new URL("/images/projects/ar-manager.svg", base));
+assert.equal(arArtwork.status, 200, "Source-informed AR Manager artwork should be available");
+assert.match(arArtwork.headers.get("content-type") || "", /image\/svg\+xml/);
+assert.match(await arArtwork.text(), /NOT A LIVE SCREENSHOT/);
 for (const path of ["/not-a-page", "/work/not-a-project", "/blog/not-an-article"]) {
   const res = await fetch(new URL(path, base));
   assert.equal(res.status, 404, `${path} should be a 404`);
