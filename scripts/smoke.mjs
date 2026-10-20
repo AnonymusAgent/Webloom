@@ -37,6 +37,11 @@ const arArtwork = await fetch(new URL("/images/projects/ar-manager.svg", base));
 assert.equal(arArtwork.status, 200, "Source-informed AR Manager artwork should be available");
 assert.match(arArtwork.headers.get("content-type") || "", /image\/svg\+xml/);
 assert.match(await arArtwork.text(), /NOT A LIVE SCREENSHOT/);
+for (const name of ["type-arena", "la-maison-restaurant"]) {
+  const artwork = await fetch(new URL(`/images/projects/${name}.jpg`, base));
+  assert.equal(artwork.status, 200, `${name} portfolio artwork should be available`);
+  assert.match(artwork.headers.get("content-type") || "", /image\/jpeg/);
+}
 for (const path of ["/not-a-page", "/work/not-a-project", "/blog/not-an-article"]) {
   const res = await fetch(new URL(path, base));
   assert.equal(res.status, 404, `${path} should be a 404`);

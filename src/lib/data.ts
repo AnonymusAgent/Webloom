@@ -200,10 +200,18 @@ const getCachedGithubProjects = unstable_cache(
   { revalidate: 300, tags: ["github-projects"] }
 );
 
+// Seed is insert-only. Existing published rows also need a cover when they
+// predate the new artwork; preserve any custom image already set in the DB.
+const PROJECT_COVERS: Record<string, string> = {
+  "type-arena": "/images/projects/type-arena.jpg",
+  "restaurant-web": "/images/projects/la-maison-restaurant.jpg",
+};
+
 export async function getGithubProjects(publishedOnly = true) {
   const rows = await getCachedGithubProjects(publishedOnly);
   return rows.map((row) => ({
     ...row,
+    image: row.image || PROJECT_COVERS[row.repo.toLowerCase()] || null,
     // The older seed misidentified this public TypeScript medical-billing app as
     // a C# desktop asset manager. Correct legacy rows at read time without
     // requiring a database migration or overriding later admin edits.
