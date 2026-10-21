@@ -106,8 +106,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <Chrome settings={settings}>{children}</Chrome>
-        {/* The Google tag loads after hydration; GA4 Enhanced Measurement handles history page views. */}
-        <GoogleAnalytics gaId="G-79N9P8BC14" />
+        {/* Do not mix local development or Vercel preview traffic into production GA4. */}
+        {process.env.NODE_ENV === "production" && process.env.VERCEL_ENV !== "preview" && (
+          <GoogleAnalytics gaId="G-79N9P8BC14" />
+        )}
       </body>
     </html>
   );
