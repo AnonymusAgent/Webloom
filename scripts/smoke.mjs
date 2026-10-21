@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 const base = process.env.BASE_URL || "http://localhost:3000";
 const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://webloom-nu.vercel.app").replace(/\/$/, "");
+const expectedGATags = process.env.VERCEL_ENV === "preview" ? 0 : 1;
 const pages = [
   "/", "/about", "/services", "/work", "/pricing", "/contact", "/blog",
   "/work/bloom-pos", "/work/noor", "/work/pulse", "/work/clarity-health",
@@ -13,6 +14,11 @@ for (const path of pages) {
   const res = await fetch(new URL(path, base));
   assert.equal(res.status, 200, `${path} should render`);
   const html = await res.text();
+  assert.equal(
+    (html.match(/https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-79N9P8BC14/g) || []).length,
+    expectedGATags,
+    `${path} should ${expectedGATags ? "include one" : "exclude the"} production GA4 tag preload`
+  );
   const title = html.match(/<title>(.*?)<\/title>/)?.[1];
   assert.ok(title && !titles.has(title), `${path} needs a unique title`);
   titles.add(title);

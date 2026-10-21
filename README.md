@@ -383,6 +383,8 @@ Recreates the baseline content — site settings, 2 published articles, and the 
 node scripts/seed.mjs
 ```
 
+For an **existing Neon `neondb` deployment**, run `npm run db:sync-content` with `DATABASE_URL` supplied securely by the environment. This checks the database identity, runs the insert-only baseline seed, then transactionally updates Type Arena's and AR Manager's live URLs, adds missing Type Arena/La Maison artwork, and corrects only known legacy AR Manager fields. It keeps existing posts, settings, and custom artwork; it does not create or migrate tables. Run it from a trusted machine or job with direct Neon network access. Never put the connection URL in Git, a command log, or a public issue.
+
 `drizzle.config.ts` loads `.env` and uses the same `DATABASE_URL` as the application. This prevents schema tools from accidentally targeting a hardcoded local database.
 
 For Neon, use the branch’s direct TLS endpoint with this application. The app already uses a bounded `pg` pool, and the direct endpoint preserves the role’s `public` search path consistently. Use the direct endpoint for `npx drizzle-kit push` as well. Neon’s transaction-pooler endpoint can reject startup/session parameters and may reuse altered session state, so only use it when the application is designed around transaction-pooling constraints.
@@ -713,7 +715,7 @@ The contact page recognizes these query parameters:
 
 ## Analytics
 
-Analytics are first-party and stored in the `events` table.
+The existing first-party analytics are stored in the `events` table. Google Analytics 4 is a separate, third-party measurement stream (see below); it does not replace or write to the database.
 
 ### Tracked data
 
@@ -723,14 +725,22 @@ Analytics are first-party and stored in the `events` table.
 - Optional event metadata
 - Timestamp
 
-### Not stored in analytics
+### Not stored in first-party analytics
 
 - IP addresses
 - Browser fingerprints
 - Cross-site identifiers
 - Advertising profiles
 
-Admin routes are excluded from page tracking, and same-origin referrers are removed before storage.
+Admin routes are excluded from first-party page tracking, and same-origin referrers are removed before storage.
+
+### Google Analytics 4
+
+The root App Router layout mounts Next.js's official `@next/third-parties/google` integration once with public measurement ID `G-79N9P8BC14` in production, but not in local development or Vercel preview builds (`VERCEL_ENV=preview`). The Google tag loads after the page becomes interactive, rather than blocking initial rendering. GA4 automatically sends a `page_view` on the initial load; its Enhanced Measurement **Page views → Page changes based on browser history events** setting handles client-side Next.js navigation. We do **not** send additional manual GA4 `page_view` events or load a GTM container. The existing `/api/track` pageviews and `data-track` CTA events remain first-party only; they are **not** forwarded to GA4.
+
+In GA4 **Admin → Data streams → Webloom web stream → Enhanced measurement**, turn on Page views (including browser history changes), Scrolls, Outbound clicks, and File downloads as appropriate. Only enable Site search if the site gains search, or Video engagement if supported embedded videos are added. Consider leaving Form interactions off for the contact form to avoid collecting form-related data. These settings are controlled in GA4, not by this repository. Avoid adding another Google tag through Vercel integrations, GTM, or GA4's connected site tags: two tags can double-count page views. GA4 may transmit the full URL (including query parameters); review links such as `/contact?ref=...`, GA4 data-redaction settings, and consent requirements before production deployment. Legal pages are templates and should be reviewed and localized for the site's jurisdictions before enabling tracking in production.
+
+After an authorized production deployment, open `https://webloom-nu.vercel.app/` without an ad blocker. In browser DevTools → Network, check for one `gtag/js?id=G-79N9P8BC14` script request and GA4 `g/collect` requests with `tid=G-79N9P8BC14`; load a public route directly, then navigate with site links to `/about` and `/contact`, checking for one `page_view` per page transition (and no duplicate event on refresh). In GA4 **Reports → Realtime**, confirm page views for those routes (allow a few minutes). For **Admin → DebugView**, use Google Tag Assistant preview mode or the GA Debugger browser extension to mark test events as debug events; ordinary production traffic is not automatically shown there. Verify Enhanced Measurement scroll/outbound-click events by triggering them, and confirm contact form field values are not sent. Script blocking, consent tools, and browser privacy settings can suppress events.
 
 ### Operational privacy note
 
