@@ -383,6 +383,8 @@ Recreates the baseline content — site settings, 2 published articles, and the 
 node scripts/seed.mjs
 ```
 
+For an **existing Neon `neondb` deployment**, run `npm run db:sync-content` with `DATABASE_URL` supplied securely by the environment. This checks the database identity, runs the insert-only baseline seed, then transactionally updates Type Arena's and AR Manager's live URLs, adds missing Type Arena/La Maison artwork, and corrects only known legacy AR Manager fields. It keeps existing posts, settings, and custom artwork; it does not create or migrate tables. Run it from a trusted machine or job with direct Neon network access. Never put the connection URL in Git, a command log, or a public issue.
+
 `drizzle.config.ts` loads `.env` and uses the same `DATABASE_URL` as the application. This prevents schema tools from accidentally targeting a hardcoded local database.
 
 For Neon, use the branch’s direct TLS endpoint with this application. The app already uses a bounded `pg` pool, and the direct endpoint preserves the role’s `public` search path consistently. Use the direct endpoint for `npx drizzle-kit push` as well. Neon’s transaction-pooler endpoint can reject startup/session parameters and may reuse altered session state, so only use it when the application is designed around transaction-pooling constraints.
