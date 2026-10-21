@@ -1,4 +1,5 @@
 import { jsonLd } from "@/lib/json-ld";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
@@ -105,6 +106,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <Chrome settings={settings}>{children}</Chrome>
+        {/* The Google tag loads after hydration; GA4 Enhanced Measurement handles history page views. */}
+        <GoogleAnalytics gaId="G-79N9P8BC14" />
       </body>
     </html>
   );

@@ -13,6 +13,11 @@ for (const path of pages) {
   const res = await fetch(new URL(path, base));
   assert.equal(res.status, 200, `${path} should render`);
   const html = await res.text();
+  assert.equal(
+    (html.match(/https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-79N9P8BC14/g) || []).length,
+    1,
+    `${path} should include exactly one GA4 tag preload from the root layout`
+  );
   const title = html.match(/<title>(.*?)<\/title>/)?.[1];
   assert.ok(title && !titles.has(title), `${path} needs a unique title`);
   titles.add(title);

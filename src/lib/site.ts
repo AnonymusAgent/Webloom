@@ -704,7 +704,7 @@ export const LEGAL: Record<
     sections: [
       {
         h: "What we collect",
-        p: "Information you submit through forms (such as your name, email, company and project details) and privacy-conscious, aggregate analytics such as page views. We do not use invasive fingerprinting or sell personal data.",
+        p: "Information you submit through forms (such as your name, email, company and project details), first-party site activity, and Google Analytics 4 usage data such as page views, device/browser information and approximate location. Google may process this data and set analytics cookies. We do not intentionally send form answers to Google Analytics or sell personal data.",
       },
       {
         h: "How we use it",
@@ -754,11 +754,11 @@ export const LEGAL: Record<
     sections: [
       {
         h: "What we use",
-        p: "A small number of cookies/local storage entries keep the site working: your theme preference, and a secure session cookie for the administrative dashboard.",
+        p: "The site stores your theme preference locally and uses a secure session cookie for the administrative dashboard. Google Analytics 4 may also set analytics cookies, such as _ga, to measure site usage.",
       },
       {
         h: "Analytics",
-        p: "If analytics are enabled, page views are recorded in an aggregate, privacy-conscious way. We do not store IP addresses or use cross-site tracking cookies.",
+        p: "First-party analytics record page views and named interactions in our database without storing visitor IPs. Google Analytics 4 separately measures page views and enabled Enhanced Measurement interactions using Google's tag and analytics cookies; Google's own processing and retention policies apply.",
       },
       {
         h: "Managing cookies",
