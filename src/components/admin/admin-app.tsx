@@ -108,7 +108,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
             />
           </AdField>
         </div>
-        {error && <p className="mt-3 text-xs text-red-400">{error}</p>}
+        {error && <p className="mt-3 text-xs text-danger">{error}</p>}
         <AdButton type="submit" disabled={busy || password.length === 0} className="mt-6 w-full">
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           Sign in
@@ -225,12 +225,12 @@ function Overview({ stats }: { stats: Stats | null }) {
 
 const STATUS_COLORS: Record<string, string> = {
   new: "border-brand/40 bg-brand/10 text-brand",
-  accepted: "border-emerald-400/30 bg-emerald-400/10 text-emerald-400",
-  rejected: "border-red-400/30 bg-red-400/10 text-red-400",
-  contacted: "border-sky-400/30 bg-sky-400/10 text-sky-400",
-  qualified: "border-violet-400/30 bg-violet-400/10 text-violet-400",
-  proposal: "border-amber-400/30 bg-amber-400/10 text-amber-400",
-  won: "border-emerald-400/30 bg-emerald-400/10 text-emerald-400",
+  accepted: "border-ok/30 bg-ok/10 text-ok",
+  rejected: "border-danger/30 bg-danger/10 text-danger",
+  contacted: "border-info/30 bg-info/10 text-info",
+  qualified: "border-accent/30 bg-accent/10 text-accent",
+  proposal: "border-warn/30 bg-warn/10 text-warn",
+  won: "border-ok/30 bg-ok/10 text-ok",
   lost: "border-line2 bg-card text-mut",
 };
 
@@ -353,7 +353,7 @@ function LeadsPanel() {
               </AdButton>
             </div>
             {messages[l.id]?.text && (
-              <p role={messages[l.id].error ? "alert" : "status"} className={`mt-3 text-xs ${messages[l.id].error ? "text-amber-400" : "text-mut"}`}>
+              <p role={messages[l.id].error ? "alert" : "status"} className={`mt-3 text-xs ${messages[l.id].error ? "text-warn" : "text-mut"}`}>
                 {messages[l.id].text}
               </p>
             )}

@@ -8,14 +8,20 @@
   --bg: #f7f7f1;
   --bg2: #ffffff;
   --ink: #0d1210;
-  --mut: rgba(13, 18, 16, 0.62);
-  --line: rgba(13, 18, 16, 0.1);
-  --line2: rgba(13, 18, 16, 0.22);
-  --brand: #0a9e67;
-  --brand2: #37c78d;
+  --mut: rgba(13, 18, 16, 0.68);
+  --line: rgba(13, 18, 16, 0.12);
+  --line2: rgba(13, 18, 16, 0.26);
+  --brand: #067a4e;
+  --brand2: #0a9e67;
   --brandink: #ffffff;
-  --card: rgba(13, 18, 16, 0.03);
-  --cardhover: rgba(13, 18, 16, 0.05);
+  --ok: #047857;
+  --warn: #854d0e;
+  --danger: #b42318;
+  --info: #175cd3;
+  --accent: #6941c6;
+  --deco: rgba(13, 18, 16, 0.06);
+  --card: rgba(13, 18, 16, 0.035);
+  --cardhover: rgba(13, 18, 16, 0.06);
   --shadow: 0 24px 60px -24px rgba(13, 18, 16, 0.18);
   --halo: radial-gradient(60% 50% at 50% 0%, rgba(10, 158, 103, 0.1), transparent 70%);
 }
@@ -24,14 +30,20 @@
   --bg: #07090a;
   --bg2: #0c0f10;
   --ink: #eef2ee;
-  --mut: rgba(238, 242, 238, 0.6);
-  --line: rgba(238, 242, 238, 0.08);
-  --line2: rgba(238, 242, 238, 0.18);
+  --mut: rgba(238, 242, 238, 0.68);
+  --line: rgba(238, 242, 238, 0.1);
+  --line2: rgba(238, 242, 238, 0.22);
   --brand: #5ee0a6;
   --brand2: #8aefcd;
   --brandink: #04150d;
-  --card: rgba(238, 242, 238, 0.03);
-  --cardhover: rgba(238, 242, 238, 0.06);
+  --ok: #5ee0a6;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --info: #60a5fa;
+  --accent: #c084fc;
+  --deco: rgba(238, 242, 238, 0.06);
+  --card: rgba(238, 242, 238, 0.035);
+  --cardhover: rgba(238, 242, 238, 0.07);
   --shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.7);
   --halo: radial-gradient(60% 50% at 50% 0%, rgba(94, 224, 166, 0.09), transparent 70%);
 }
@@ -46,6 +58,12 @@
   --color-brand: var(--brand);
   --color-brand2: var(--brand2);
   --color-brandink: var(--brandink);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-accent: var(--accent);
+  --color-deco: var(--deco);
   --color-card: var(--card);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-mono-alt), ui-monospace, "SF Mono", Menlo, monospace;
@@ -78,6 +96,29 @@ body {
   text-rendering: optimizeLegibility;
   overflow-x: clip;
   transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Native form controls should follow the active theme instead of the browser
+   default, which leaves text and option lists unreadable in one of the modes. */
+input,
+textarea,
+select {
+  color: var(--ink);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in oklab, var(--mut) 82%, transparent);
+  opacity: 1;
+}
+
+select option {
+  background-color: var(--bg2);
+  color: var(--ink);
+}
+
+input[type="range"] {
+  accent-color: var(--brand);
 }
 
 ::selection {

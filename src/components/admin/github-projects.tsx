@@ -193,7 +193,7 @@ export default function GithubProjectsPanel() {
         </div>
 
         {error && (
-          <p role="alert" className="mt-4 flex items-start gap-2 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-xs leading-relaxed text-red-300">
+          <p role="alert" className="mt-4 flex items-start gap-2 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-xs leading-relaxed text-danger">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {error}
           </p>
         )}
@@ -299,10 +299,10 @@ export default function GithubProjectsPanel() {
                       <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[0.58rem] text-mut">
                         {project.category}
                       </span>
-                      <span className={`rounded-full border px-2 py-0.5 font-mono text-[0.58rem] uppercase ${project.visibility === "private" ? "border-amber-400/30 bg-amber-400/10 text-amber-400" : "border-brand/30 bg-brand/10 text-brand"}`}>
+                      <span className={`rounded-full border px-2 py-0.5 font-mono text-[0.58rem] uppercase ${project.visibility === "private" ? "border-warn/30 bg-warn/10 text-warn" : "border-brand/30 bg-brand/10 text-brand"}`}>
                         {project.visibility}
                       </span>
-                      {project.archived && <span className="text-[0.65rem] text-amber-400">Archived</span>}
+                      {project.archived && <span className="text-[0.65rem] text-warn">Archived</span>}
                     </div>
                     <a href={project.githubUrl} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-xs text-mut hover:text-brand">
                       {project.owner}/{project.repo} <ExternalLink className="h-3 w-3" />

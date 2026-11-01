@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export const adInput =
-  "w-full rounded-xl border border-line bg-elev/60 px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-mut/50 focus:border-brand/60";
+  "w-full rounded-xl border border-line bg-elev/60 px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-mut/80 focus:border-brand/60";
 
 export function AdField({
   label,
@@ -47,7 +47,7 @@ export function AdButton({
         "inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-[0.8rem] font-semibold transition-all disabled:opacity-50",
         variant === "primary" && "bg-brand text-brandink hover:shadow-[0_6px_20px_-6px_var(--brand)]",
         variant === "ghost" && "border border-line text-mut hover:border-line2 hover:text-ink",
-        variant === "danger" && "border border-red-400/30 text-red-400 hover:bg-red-400/10",
+        variant === "danger" && "border border-danger/30 text-danger hover:bg-danger/10",
         className
       )}
     >
@@ -129,11 +129,11 @@ export function StatCard({
 export function levelColor(level: string) {
   switch (level) {
     case "security":
-      return "text-amber-400 border-amber-400/30 bg-amber-400/10";
+      return "text-accent border-accent/30 bg-accent/10";
     case "error":
-      return "text-red-400 border-red-400/30 bg-red-400/10";
+      return "text-danger border-danger/30 bg-danger/10";
     case "warn":
-      return "text-orange-400 border-orange-400/30 bg-orange-400/10";
+      return "text-warn border-warn/30 bg-warn/10";
     default:
       return "text-brand border-brand/30 bg-brand/10";
   }

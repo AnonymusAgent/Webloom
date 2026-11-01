@@ -35,7 +35,7 @@ export default function TierCard({
       <ul className={`mt-6 space-y-2.5 ${compact ? "" : "flex-1"}`}>
         {tier.features.map((f) => (
           <li key={f} className="flex items-start gap-2.5 text-sm text-mut">
-            <span className="mt-0.5 inline-flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-brand/12 text-brand">
+            <span className="mt-0.5 inline-flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
               <Check className="h-3 w-3" strokeWidth={3} />
             </span>
             {f}

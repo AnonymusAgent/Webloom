@@ -42,7 +42,7 @@ export default function ServicesSection() {
               >
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute -right-3 -top-6 font-mono text-[5.5rem] font-bold leading-none text-ink/[0.045] transition-colors duration-500 group-hover:text-brand/10"
+                  className="pointer-events-none absolute -right-3 -top-6 font-mono text-[5.5rem] font-bold leading-none text-deco transition-colors duration-500 group-hover:text-brand/10"
                 >
                   0{i + 1}
                 </span>

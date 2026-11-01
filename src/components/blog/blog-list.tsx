@@ -47,7 +47,7 @@ export default function BlogList({ posts, categories }: { posts: PostListItem[];
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search insights…"
               aria-label="Search insights"
-              className="w-full rounded-full border border-line bg-elev/60 py-3 pl-11 pr-4 text-sm outline-none transition-all placeholder:text-mut/60 focus:border-brand/60"
+              className="w-full rounded-full border border-line bg-elev/60 py-3 pl-11 pr-4 text-sm outline-none transition-all placeholder:text-mut/80 focus:border-brand/60"
             />
           </div>
           <div className="hide-scrollbar flex gap-2 overflow-x-auto">

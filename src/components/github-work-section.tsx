@@ -49,7 +49,7 @@ function FeaturedProject({ project, index }: { project: GithubProject; index: nu
               <BadgeCheck className="h-3 w-3 text-brand" /> Source verified
             </Chip>
           </div>
-          <span className="absolute bottom-4 right-5 font-mono text-xs text-white/70">
+          <span className="absolute bottom-4 right-5 font-mono text-xs text-white/80">
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
@@ -168,7 +168,7 @@ function ArchiveProject({ project, index }: { project: GithubProject; index: num
         {stack.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
             {stack.map((technology) => (
-              <span key={technology} className="rounded-full bg-brand/8 px-2.5 py-1 font-mono text-[0.6rem] text-brand">
+              <span key={technology} className="rounded-full bg-brand/10 px-2.5 py-1 font-mono text-[0.6rem] text-brand">
                 {technology}
               </span>
             ))}

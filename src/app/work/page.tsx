@@ -82,7 +82,7 @@ export default async function WorkPage() {
                     <span className="absolute bottom-5 left-6 font-mono text-[0.65rem] tracking-[0.12em] text-white/80 uppercase">
                       Illustrative artwork
                     </span>
-                    <span aria-hidden="true" className="absolute bottom-4 right-6 font-mono text-5xl font-bold text-white/35">
+                    <span aria-hidden="true" className="absolute bottom-4 right-6 font-mono text-5xl font-bold text-white/45">
                       0{i + 1}
                     </span>
                   </div>

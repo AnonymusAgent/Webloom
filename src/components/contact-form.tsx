@@ -16,7 +16,7 @@ export type ContactInitial = {
 type Errors = Partial<Record<string, string>>;
 
 const inputCls =
-  "w-full rounded-2xl border border-line bg-elev/60 px-4 py-3 text-sm outline-none transition-all duration-300 placeholder:text-mut/60 focus:border-brand/60 focus:bg-elev";
+  "w-full rounded-2xl border border-line bg-elev/60 px-4 py-3 text-sm outline-none transition-all duration-300 placeholder:text-mut/80 focus:border-brand/60 focus:bg-elev";
 
 function Field({
   label,
@@ -38,7 +38,7 @@ function Field({
           {label}
           {required && <span className="ml-1 text-brand">*</span>}
         </span>
-        {error && <span id={errorId} className="text-[0.7rem] text-red-400">{error}</span>}
+        {error && <span id={errorId} className="text-[0.7rem] text-danger">{error}</span>}
       </span>
       {children}
     </label>
@@ -125,7 +125,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.15 }}
-          className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand/12 text-brand"
+          className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand/10 text-brand"
         >
           <CheckCircle2 className="h-7 w-7" />
         </motion.span>
@@ -162,7 +162,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
         <input id="wl-website" name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => set("website", e.target.value)} />
       </div>
       {Object.keys(errors).length > 0 && (
-        <p role="alert" className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-ink">
+        <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-ink">
           Please check the highlighted fields before sending your brief.
         </p>
       )}
@@ -172,7 +172,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
             required
             value={form.name}
             onChange={(e) => set("name", e.target.value)}
-            className={cn(inputCls, errors.name && "border-red-400/60")}
+            className={cn(inputCls, errors.name && "border-danger/60")}
             placeholder="Your name"
             autoComplete="name"
             aria-invalid={Boolean(errors.name)}
@@ -199,7 +199,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
             type="email"
             value={form.email}
             onChange={(e) => set("email", e.target.value)}
-            className={cn(inputCls, errors.email && "border-red-400/60")}
+            className={cn(inputCls, errors.email && "border-danger/60")}
             placeholder="you@company.com"
             autoComplete="email"
             aria-invalid={Boolean(errors.email)}
@@ -226,7 +226,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
             Project type
             <span className="ml-1 text-brand">*</span>
           </span>
-          {errors.projectType && <span id="project-type-error" className="text-[0.7rem] text-red-400">{errors.projectType}</span>}
+          {errors.projectType && <span id="project-type-error" className="text-[0.7rem] text-danger">{errors.projectType}</span>}
         </span>
         <div
           className="flex flex-wrap gap-2"
@@ -298,7 +298,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
           rows={5}
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? "message-error" : undefined}
-          className={cn(inputCls, "resize-none", errors.message && "border-red-400/60")}
+          className={cn(inputCls, "resize-none", errors.message && "border-danger/60")}
           placeholder="What are you building? Who is it for? What should it do?"
           maxLength={4000}
         />
@@ -311,7 +311,7 @@ export default function ContactForm({ initial }: { initial?: ContactInitial }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             role="alert"
-            className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-ink"
+            className="rounded-2xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-ink"
           >
             {serverError || "Couldn't send your brief. Please try again."}
           </motion.p>

@@ -123,7 +123,7 @@ export function PostsPanel() {
           <Toggle checked={form.published} onChange={(v) => setForm({ ...form, published: v })} label="Published" />
           <Toggle checked={form.featured} onChange={(v) => setForm({ ...form, featured: v })} label="Featured" />
           <span className="ml-auto flex items-center gap-3">
-            {error && <span className="text-xs text-red-400">{error}</span>}
+            {error && <span className="text-xs text-danger">{error}</span>}
             <AdButton onClick={save} disabled={busy || form.title.trim().length === 0}>
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Save post
@@ -152,7 +152,7 @@ export function PostsPanel() {
               <p className="truncate font-semibold tracking-tight">{p.title}</p>
               <p className="mt-1 text-xs text-mut">
                 {p.category} · {formatDate(p.createdAt)} ·{" "}
-                <span className={p.published ? "text-brand" : "text-amber-400"}>
+                <span className={p.published ? "text-brand" : "text-warn"}>
                   {p.published ? "Published" : "Draft"}
                 </span>
                 {p.featured && " · Featured"}
@@ -280,7 +280,7 @@ export function TestimonialsPanel() {
                 </p>
                 <p className="mt-2 line-clamp-2 text-sm text-mut">“{t.quote}”</p>
                 <p className="mt-1.5 text-xs">
-                  <span className={t.published ? "text-brand" : "text-amber-400"}>
+                  <span className={t.published ? "text-brand" : "text-warn"}>
                     {t.published ? "Published" : "Hidden"}
                   </span>
                 </p>
@@ -392,7 +392,7 @@ export function FaqsPanel() {
                 <p className="font-semibold tracking-tight">{f.question}</p>
                 <p className="mt-1.5 line-clamp-2 text-sm text-mut">{f.answer}</p>
                 <p className="mt-1.5 text-xs">
-                  <span className={f.published ? "text-brand" : "text-amber-400"}>
+                  <span className={f.published ? "text-brand" : "text-warn"}>
                     {f.published ? "Published" : "Hidden"}
                   </span>
                   <span className="text-mut"> · sort {f.sort}</span>
@@ -525,7 +525,7 @@ export function SettingsPanel() {
           Save settings
         </AdButton>
         {saved && <span className="text-xs text-brand">Saved — live on the site now.</span>}
-        {error && <span className="text-xs text-red-400">{error}</span>}
+        {error && <span className="text-xs text-danger">{error}</span>}
       </div>
     </PanelCard>
   );
