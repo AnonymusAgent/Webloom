@@ -4,21 +4,23 @@ import { LIVE_PROJECTS, liveProjectUrl } from "../src/lib/live-projects.ts";
 import { VERIFIED_PROJECT_COVERS, withVerifiedProjects } from "../src/lib/verified-projects.ts";
 
 const projects = withVerifiedProjects([]);
-assert.equal(projects.length, 20, "The curated public baseline should be complete");
+assert.equal(projects.length, 21, "The curated public baseline should be complete");
 assert.equal(new Set(projects.map((project) => project.githubId)).size, projects.length);
 assert.equal(new Set(projects.map((project) => project.slug)).size, projects.length);
 assert.ok(projects.every((project) => project.visibility === "public" && project.published));
-const featuredIds = ["1326109868", "1441273336", "1406597009"];
-assert.deepEqual(projects.slice(0, 3).map((project) => project.githubId), featuredIds,
-  "Bloom AR, Bloom RCM and Type Arena should lead the Work page and homepage preview");
-assert.deepEqual(projects.slice(0, 3).map((project) => project.name), ["Bloom AR", "Bloom RCM", "Type Arena"]);
+const featuredIds = ["1326109868", "1441273336", "1406597009", "1445700910"];
+assert.deepEqual(projects.slice(0, 4).map((project) => project.githubId), featuredIds,
+  "Bloom AR, Bloom RCM, Type Arena and VELTRIO should lead the Work page and homepage preview");
+assert.deepEqual(projects.slice(0, 4).map((project) => project.name), ["Bloom AR", "Bloom RCM", "Type Arena", "VELTRIO"]);
 assert.equal(projects[0].githubUrl, "https://github.com/AnonymusAgent/Bloom-AR");
 assert.equal(projects[1].githubUrl, "https://github.com/AnonymusAgent/bloomrcm");
-assert.deepEqual(LIVE_PROJECTS.map(({ name }) => name), ["Bloom AR", "Bloom RCM", "Type Arena"]);
+assert.equal(projects[3].githubUrl, "https://github.com/AnonymusAgent/VELTRIO");
+assert.deepEqual(LIVE_PROJECTS.map(({ name }) => name), ["Bloom AR", "Bloom RCM", "Type Arena", "VELTRIO"]);
 assert.equal(liveProjectUrl("AR-Manager"), "https://bloomar.vercel.app/");
 assert.equal(liveProjectUrl("Bloom-AR"), "https://bloomar.vercel.app/");
 assert.equal(liveProjectUrl("bloomrcm"), "https://bloomrcm.vercel.app/");
 assert.equal(liveProjectUrl("type-arena"), "https://arena-skill.vercel.app/");
+assert.equal(liveProjectUrl("VELTRIO"), "https://veltrio-new.vercel.app/");
 for (const project of projects) {
   assert.match(project.githubUrl, /^https:\/\/github\.com\/AnonymusAgent\//);
   assert.ok(project.image && existsSync(`public${project.image}`), `${project.slug} needs its artwork`);
@@ -35,7 +37,7 @@ assert.equal(merged.find((project) => project.githubId === arena.githubId).image
 const oldRows = featuredIds.map((id) => ({
   ...projects.find((project) => project.githubId === id), featured: false,
 }));
-assert.deepEqual(withVerifiedProjects(oldRows).slice(0, 3).map((project) => project.githubId), featuredIds,
+assert.deepEqual(withVerifiedProjects(oldRows).slice(0, 4).map((project) => project.githubId), featuredIds,
   "Older DB featured flags must not displace the requested showcase order");
 
 const unpublished = withVerifiedProjects([{ ...arena, published: false }]);
@@ -44,4 +46,4 @@ assert.ok(!unpublished.some((project) => project.githubId === arena.githubId));
 
 const renamed = withVerifiedProjects([{ ...arena, githubId: "replacement", slug: arena.slug }]);
 assert.equal(renamed.length, projects.length, "A matching slug must not get a duplicate card");
-console.log("20 curated public projects; order, live links, fallbacks, edits, unpublished rows, slugs and images verified.");
+console.log("21 curated public projects; order, live links, fallbacks, edits, unpublished rows, slugs and images verified.");

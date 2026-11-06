@@ -33,7 +33,7 @@ function FeaturedProject({ project, index }: { project: GithubProject; index: nu
           {project.image ? (
             <Image
               src={project.image}
-              alt={project.githubId === "1326109868" ? "Bloom AR source-informed dashboard illustration, not a live screenshot" : `${project.name} product visualization`}
+              alt={project.githubId === "1326109868" ? "Bloom AR source-informed dashboard illustration, not a live screenshot" : project.githubId === "1445700910" ? "VELTRIO brand artwork from its public repository, not a screenshot" : `${project.name} product visualization`}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"

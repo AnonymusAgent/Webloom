@@ -49,6 +49,7 @@ const PINNED_FEATURED = new Map([
   ["1326109868", 0], // Bloom AR
   ["1441273336", 1], // Bloom RCM — second in Work and the homepage preview
   ["1406597009", 2], // Type Arena
+  ["1445700910", 3], // VELTRIO — fourth in Work and the homepage preview
 ]);
 
 export function withVerifiedProjects(rows: GithubProject[]): GithubProject[] {
@@ -59,7 +60,7 @@ export function withVerifiedProjects(rows: GithubProject[]): GithubProject[] {
     ...baseline.filter((project) => !knownIds.has(project.githubId) && !knownSlugs.has(project.slug)),
   ];
   return merged
-    // Respect explicit unpublishing; only the three requested showcase slots
+    // Respect explicit unpublishing; only the four requested showcase slots
     // override older featured flags so imported DB rows match the public order.
     .filter((project) => project.published)
     .map((project) => PINNED_FEATURED.has(project.githubId) ? { ...project, featured: true } : project)

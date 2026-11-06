@@ -522,5 +522,32 @@
     "pushedAt": "2026-11-01T01:45:01Z",
     "stars": 0,
     "githubUrl": "https://github.com/AnonymusAgent/bloomrcm"
+  },
+  {
+    "githubId": "1445700910",
+    "repo": "VELTRIO",
+    "slug": "veltrio",
+    "name": "VELTRIO",
+    "category": "Video Streaming & Creator Platform",
+    "summary": "A cinematic video platform for browsing and watching original videos, with search, categories, likes, comments and saved lists; creator uploads and publishing tools, user accounts and a private admin studio.",
+    "image": "/images/projects/veltrio.jpg",
+    "language": "TypeScript",
+    "tech": [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "PostgreSQL",
+      "Drizzle ORM",
+      "Mux"
+    ],
+    "topics": [
+      "video-streaming",
+      "creator-studio",
+      "media-platform"
+    ],
+    "featured": true,
+    "pushedAt": "2026-11-05T19:22:59Z",
+    "stars": 0,
+    "githubUrl": "https://github.com/AnonymusAgent/VELTRIO"
   }
 ]
