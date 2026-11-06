@@ -240,7 +240,8 @@ Six frequently asked questions appear on the homepage; the full list remains on 
 | `POST` | `/api/track` | Public, rate-limited | Stores page views and named interactions |
 | `GET` | `/api/site-settings` | Public, cached | Returns public contact email and owned social links only |
 | `GET` | `/api/admin/session` | Public | Returns current admin-session state |
-| `POST` | `/api/admin/session` | Public, rate-limited | Authenticates and creates a session cookie |
+| `POST` | `/api/admin/session` | Public, rate-limited | Authenticates and creates a browser-session cookie with a five-minute token |
+| `PATCH` | `/api/admin/session` | Admin | Renews the five-minute token after genuine admin activity |
 | `DELETE` | `/api/admin/session` | Public | Clears the admin session cookie |
 | `GET` | `/api/admin/leads` | Admin | Returns up to 500 recent leads |
 | `PATCH` | `/api/admin/leads` | Admin | Changes a lead status |
@@ -487,7 +488,9 @@ Visit `/admin` and sign in with `ADMIN_PASSWORD`.
 
 - Authentication is a single administrator password, not a multi-user account system.
 - Successful login creates the `wl_admin` cookie.
-- The cookie is HTTP-only, SameSite=Lax, secure in production, and valid for 12 hours.
+- The cookie is HTTP-only, SameSite=Lax and secure in production; it has no persistent expiry, so the browser discards it when the browser session ends.
+- The signed session token expires after **5 minutes**. Activity inside `/admin` renews it via authenticated `PATCH /api/admin/session`; background requests do not keep it alive. After five minutes without pointer, keyboard, touch or wheel activity, the dashboard signs out and protected APIs reject the expired token.
+- Closing or navigating away from the admin page clears its tab-scoped session marker and sends a best-effort logout request. Reopening `/admin` requires signing in again, even if a browser restored a cookie. A hard reload also logs out as a conservative tradeoff. Browser unload requests are not guaranteed to complete; the signed token remains subject to its five-minute maximum if an unload request is interrupted.
 - Session payloads are signed with HMAC-SHA256 using `ADMIN_SECRET` (or the password fallback).
 - Password comparison uses a timing-safe comparison.
 - Login is limited to eight attempts per forwarded IP over 15 minutes per running application process.
@@ -898,6 +901,7 @@ Run the complete validation sequence before deployment:
 npx next typegen
 npm exec tsc -- --noEmit --pretty false
 npm run lint
+npm run test:admin-session
 npm run build
 ```
 

@@ -1,0 +1,22 @@
+import assert from "node:assert/strict";
+import { createHmac } from "node:crypto";
+import { ADMIN_IDLE_MS, createAdminToken, verifyAdminToken } from "../src/lib/admin-token.ts";
+
+const secret = "test-only-admin-secret";
+const now = 1_800_000_000_000;
+assert.equal(ADMIN_IDLE_MS, 5 * 60 * 1000);
+const token = createAdminToken(secret, now);
+assert.equal(verifyAdminToken(token, secret, now), true);
+assert.equal(verifyAdminToken(token, secret, now + ADMIN_IDLE_MS - 1), true);
+assert.equal(verifyAdminToken(token, secret, now + ADMIN_IDLE_MS), false);
+assert.equal(verifyAdminToken(token, "incorrect", now), false);
+assert.equal(verifyAdminToken(`${token}extra`, secret, now), false);
+assert.equal(verifyAdminToken(`${token}.extra`, secret, now), false);
+assert.equal(verifyAdminToken(null, secret, now), false);
+const legacyPayload = Buffer.from(JSON.stringify({ sub: "admin", exp: now + 12 * 60 * 60 * 1000 })).toString("base64url");
+const legacySignature = createHmac("sha256", secret).update(legacyPayload).digest("base64url");
+assert.equal(verifyAdminToken(`${legacyPayload}.${legacySignature}`, secret, now), false, "Old 12-hour cookies must be rejected");
+const renewed = createAdminToken(secret, now + ADMIN_IDLE_MS - 1);
+assert.equal(verifyAdminToken(renewed, secret, now + ADMIN_IDLE_MS * 2 - 2), true);
+assert.equal(verifyAdminToken(renewed, secret, now + ADMIN_IDLE_MS * 2 - 1), false);
+console.log("Admin tokens expire at five minutes and only explicit renewal extends access.");
