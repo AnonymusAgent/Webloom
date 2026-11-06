@@ -1,13 +1,32 @@
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
-import { adminPassword, COOKIE, createToken, isAdmin, isAdminConfigured, MAX_AGE } from "@/lib/auth";
+import { adminPassword, COOKIE, createToken, isAdmin, isAdminConfigured } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { log } from "@/lib/data";
 
 export const runtime = "nodejs";
 
+function setSessionCookie(response: NextResponse) {
+  // No Max-Age or Expires: the browser discards the cookie on browser close.
+  // The signed token itself expires after five minutes without renewal.
+  response.cookies.set(COOKIE, createToken(), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
+  return response;
+}
+
 export async function GET() {
-  return NextResponse.json({ admin: await isAdmin() });
+  return NextResponse.json({ admin: await isAdmin() }, { headers: { "Cache-Control": "no-store" } });
+}
+
+export async function PATCH() {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "Session expired." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+  }
+  return setSessionCookie(NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } }));
 }
 
 export async function POST(req: Request) {
@@ -37,21 +56,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
   }
 
-  const token = createToken();
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set(COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: MAX_AGE,
-    path: "/",
-  });
+  const res = setSessionCookie(NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } }));
   await log("security", "admin_login_success");
   return res;
 }
 
 export async function DELETE() {
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set(COOKIE, "", { httpOnly: true, maxAge: 0, path: "/" });
+  const res = NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
+  res.cookies.set(COOKIE, "", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 0, path: "/" });
   return res;
 }

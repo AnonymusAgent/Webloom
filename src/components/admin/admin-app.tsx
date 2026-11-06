@@ -22,6 +22,7 @@ import { Logo } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme";
 import { EASE } from "@/components/motion";
 import GithubProjectsPanel from "@/components/admin/github-projects";
+import { ADMIN_IDLE_MS, forgetAdminActivity, readAdminActivity, rememberAdminActivity, useAdminIdle } from "@/components/admin/use-admin-idle";
 import { AdButton, AdField, EmptyState, PanelCard, StatCard, adInput } from "@/components/admin/admin-ui";
 import {
   FaqsPanel,
@@ -94,7 +95,7 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
           <Lock className="h-5 w-5" strokeWidth={1.6} />
         </span>
         <h1 className="mt-6 text-2xl font-semibold tracking-tight">Webloom Admin</h1>
-        <p className="mt-2 text-sm text-mut">Protected area — enter the admin password.</p>
+        <p className="mt-2 text-sm text-mut">Protected area — enter the admin password. Sessions end after 5 minutes of inactivity or when you leave this page.</p>
         <div className="mt-7">
           <AdField label="Password">
             <input
@@ -402,12 +403,42 @@ export default function AdminApp() {
     }
   }, []);
 
-  useEffect(() => {
-    fetch("/api/admin/session")
-      .then((r) => r.json())
-      .then((d) => setStatus(d.admin ? "ready" : "login"))
-      .catch(() => setStatus("login"));
+  const logout = useCallback(() => {
+    forgetAdminActivity();
+    setStats(null);
+    setLogs([]);
+    setStatus("loading");
+    void fetch("/api/admin/session", { method: "DELETE", cache: "no-store" })
+      .catch(() => {})
+      .finally(() => setStatus("login"));
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const lastActivity = readAdminActivity();
+    if (!lastActivity) {
+      // A new tab cannot inherit an admin UI session from a cookie in another
+      // tab. Do not clear that cookie here: the other tab may still be active.
+      queueMicrotask(() => { if (mounted) setStatus("login"); });
+    } else if (Date.now() - lastActivity >= ADMIN_IDLE_MS) {
+      forgetAdminActivity();
+      void fetch("/api/admin/session", { method: "DELETE", cache: "no-store" })
+        .catch(() => {})
+        .finally(() => { if (mounted) setStatus("login"); });
+    } else {
+      void fetch("/api/admin/session", { cache: "no-store" })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!mounted) return;
+          if (data.admin) setStatus("ready");
+          else { forgetAdminActivity(); setStatus("login"); }
+        })
+        .catch(() => { if (mounted) setStatus("login"); });
+    }
+    return () => { mounted = false; };
+  }, []);
+
+  useAdminIdle(status === "ready", logout);
 
   useEffect(() => {
     if (status !== "ready") return;
@@ -416,11 +447,6 @@ export default function AdminApp() {
     }, 0);
     return () => window.clearTimeout(timer);
   }, [status, loadStats]);
-
-  async function logout() {
-    await fetch("/api/admin/session", { method: "DELETE" });
-    setStatus("login");
-  }
 
   if (status === "loading") {
     return (
@@ -434,6 +460,7 @@ export default function AdminApp() {
     return (
       <LoginForm
         onSuccess={() => {
+          rememberAdminActivity();
           setStatus("ready");
         }}
       />

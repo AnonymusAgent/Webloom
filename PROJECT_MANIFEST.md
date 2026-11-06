@@ -108,7 +108,7 @@ webloom/
 | POST | `/api/contact` | Public, rate-limited | Validate + store project briefs (leads) |
 | POST | `/api/track` | Public, rate-limited | Pageview/CTA analytics ingestion |
 | GET | `/api/site-settings` | Public, cached 5 min | Public contact email + social links |
-| GET/POST/DELETE | `/api/admin/session` | Public/rate-limited | Admin login, logout, session state |
+| GET/POST/PATCH/DELETE | `/api/admin/session` | Public login / authenticated renewal | Admin login, activity-based five-minute renewal, logout, session state; tab close clears the tab marker and requests logout |
 | GET/PATCH | `/api/admin/leads` | Admin | Lead list + status pipeline updates |
 | GET/POST/PATCH/DELETE | `/api/admin/content` | Admin | Blog, testimonials, FAQs CRUD + cache invalidation |
 | GET/POST/PATCH/DELETE | `/api/admin/github` | Admin | Repository discovery, import, review, removal |
