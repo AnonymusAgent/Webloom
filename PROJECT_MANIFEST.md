@@ -69,7 +69,7 @@ webloom/
 │   └── og-image.jpg                  # 1200×630 social sharing image
 ├── drizzle/                          # Generated SQL migrations + metadata
 ├── scripts/
-│   └── seed.mjs                      # Idempotent content seed (17 projects,
+│   └── seed.mjs                      # Idempotent content seed (19 projects,
 │                                    #   2 articles, settings)
 ├── .env.example                      # All environment variable names + docs
 ├── .gitignore                        # Protects secrets and build output
@@ -177,7 +177,7 @@ All are documented in `.env.example`. `NODE_ENV` is framework-managed.
 | Runtime data (leads, events, logs in your live DB) | Operational data, not source. Structure + seed content are included; use your existing Neon database or run migrations + seed. |
 | Neon connection string | Secret — never embedded in downloadable source |
 
-**Database data note:** your live Neon database already contains all content. The included `scripts/seed.mjs` reproduces the same content (settings, 2 articles, 17 projects) idempotently on any fresh database — existing rows are never overwritten.
+**Database data note:** the included `scripts/seed.mjs` can insert missing settings, 2 articles and 19 curated public projects without overwriting existing rows. The public portfolio also uses this shared project list as a read-only fallback for missing rows or database outages. This does not prove that the live Neon database contains those records, and it cannot reconstruct other admin-imported projects.
 
 ## 9. Quick start
 

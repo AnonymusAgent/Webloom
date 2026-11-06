@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:smoke": "node scripts/smoke.mjs",
+    "test:portfolio": "node --experimental-strip-types scripts/test-verified-projects.mjs",
     "db:sync-content": "node scripts/sync-content.mjs"
   },
   "dependencies": {

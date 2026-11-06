@@ -1,5 +1,6 @@
 /** Production-mode HTTP/SEO checks. Run after `npm run start` with BASE_URL set. */
 import assert from "node:assert/strict";
+import verifiedProjects from "../src/lib/verified-projects.json" with { type: "json" };
 
 const base = process.env.BASE_URL || "http://localhost:3000";
 const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://webloom-nu.vercel.app").replace(/\/$/, "");
@@ -29,6 +30,17 @@ for (const path of pages) {
   const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
   assert.equal(canonical, site + (path === "/" ? "" : path), `${path} needs a canonical`);
   assert.equal(html.includes('name="robots" content="noindex'), path.startsWith("/legal/"), `${path} robots mismatch`);
+  if (process.env.EXPECT_BASELINE_PORTFOLIO === "1" && path === "/work") {
+    for (const project of verifiedProjects) {
+      const source = project.githubUrl || `https://github.com/AnonymusAgent/${project.repo}`;
+      assert.ok(html.includes(`href="${source}"`), `/work missing ${project.name}'s source link`);
+      assert.ok(html.includes(`>${project.name}</h`), `/work missing ${project.name}'s title`);
+    }
+  }
+  if (process.env.EXPECT_BASELINE_PORTFOLIO === "1" && path === "/") {
+    assert.ok(html.includes('id="verified-work-h"'), "Homepage missing verified work showcase");
+    assert.ok(html.includes('href="/work#type-arena"'), "Type Arena should be featured on the homepage");
+  }
   if (path === "/work" || path.startsWith("/work/")) {
     const slugs = path === "/work" ? ["bloom-pos", "noor", "pulse", "clarity-health"] : [path.split("/")[2]];
     for (const slug of slugs) {

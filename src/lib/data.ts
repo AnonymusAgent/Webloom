@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { FAQS, SITE } from "@/lib/site";
 import { liveProjectUrl } from "@/lib/live-projects";
+import { withVerifiedProjects } from "@/lib/verified-projects";
 
 /* ------------------------------- settings -------------------------------- */
 
@@ -170,26 +171,18 @@ export async function getPostBySlug(slug: string) {
 
 /* -------------------------- verified GitHub work --------------------------- */
 
-async function readGithubProjects(publishedOnly = true) {
+async function readGithubProjects() {
   try {
-    return publishedOnly
-      ? await db
-          .select()
-          .from(githubProjects)
-          .where(eq(githubProjects.published, true))
-          .orderBy(
-            desc(githubProjects.featured),
-            desc(githubProjects.pushedAt),
-            desc(githubProjects.updatedAt)
-          )
-      : await db
-          .select()
-          .from(githubProjects)
-          .orderBy(
-            desc(githubProjects.featured),
-            desc(githubProjects.pushedAt),
-            desc(githubProjects.updatedAt)
-          );
+    // Include unpublished rows so the public fallback never undoes an admin's
+    // explicit decision to hide a project.
+    return await db
+      .select()
+      .from(githubProjects)
+      .orderBy(
+        desc(githubProjects.featured),
+        desc(githubProjects.pushedAt),
+        desc(githubProjects.updatedAt)
+      );
   } catch {
     return [];
   }
@@ -197,7 +190,7 @@ async function readGithubProjects(publishedOnly = true) {
 
 const getCachedGithubProjects = unstable_cache(
   readGithubProjects,
-  ["webloom-github-projects-v1"],
+  ["webloom-github-projects-v2"],
   { revalidate: 300, tags: ["github-projects"] }
 );
 
@@ -209,8 +202,8 @@ const PROJECT_COVERS: Record<string, string> = {
 };
 
 export async function getGithubProjects(publishedOnly = true) {
-  const rows = await getCachedGithubProjects(publishedOnly);
-  return rows.map((row) => ({
+  const rows = await getCachedGithubProjects();
+  return (publishedOnly ? withVerifiedProjects(rows) : rows).map((row) => ({
     ...row,
     // The seed is insert-only and older imports may have no homepage. Keep the
     // two explicitly verified public deployments in sync on every public card.

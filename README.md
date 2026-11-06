@@ -377,7 +377,7 @@ npx drizzle-kit push
 
 ### 5. Seed the content (optional)
 
-Recreates the baseline content — site settings, 2 published articles, and the 17 source-verified GitHub portfolio projects — on any database. Idempotent: existing rows are never overwritten, so admin edits are preserved.
+Recreates the baseline content — site settings, 2 published articles, and the 19 curated public GitHub portfolio projects — on any database. Idempotent: existing rows are never overwritten, so admin edits are preserved. The same public project list in `src/lib/verified-projects.json` is also used as a read-only showcase fallback: if database rows are absent or unavailable, those projects still appear on the homepage and `/work`. Existing rows take precedence, including unpublished rows, so admin edits and explicit unpublishing are respected. Missing curated entries are shown without silently writing to the database; other historical admin imports (including private repositories) cannot be recovered from this list.
 
 ```bash
 node scripts/seed.mjs
