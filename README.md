@@ -377,13 +377,13 @@ npx drizzle-kit push
 
 ### 5. Seed the content (optional)
 
-Recreates the baseline content — site settings, 2 published articles, and the 21 curated public GitHub portfolio projects — on any database. Idempotent: existing rows are never overwritten, so admin edits are preserved. The same public project list in `src/lib/verified-projects.json` is also used as a read-only showcase fallback: if database rows are absent or unavailable, those projects still appear on the homepage and `/work`. Existing rows take precedence, including unpublished rows, so admin edits and explicit unpublishing are respected. Missing curated entries are shown without silently writing to the database; other historical admin imports (including private repositories) cannot be recovered from this list.
+Recreates the baseline content — site settings, 2 published articles, and the 20 curated public GitHub portfolio projects — on any database. Idempotent: existing rows are never overwritten, so admin edits are preserved. The same public project list in `src/lib/verified-projects.json` is also used as a read-only showcase fallback: if database rows are absent or unavailable, those projects still appear on the homepage and `/work`. Existing rows take precedence, including unpublished rows, so admin edits and explicit unpublishing are respected. The one exception is the retired PlumberElectric project: it is excluded from the curated seed and hidden on public pages by GitHub ID even if an older database row remains. Its database record is not deleted, and the existing ProFix row is featured on public pages without overwriting admin fields. Missing curated entries are shown without silently writing to the database; other historical admin imports (including private repositories) cannot be recovered from this list.
 
 ```bash
 node scripts/seed.mjs
 ```
 
-For an **existing Neon `neondb` deployment**, run `npm run db:sync-content` with `DATABASE_URL` supplied securely by the environment. This checks the database identity and runs the insert-only baseline seed (including Bloom RCM and VELTRIO). It then transactionally updates Type Arena's live URL only, renames the existing AR project to Bloom AR with its new source/live URLs and known legacy metadata corrections, and adds missing La Maison artwork. It keeps existing posts, settings, and custom artwork; it does not create or migrate tables. The public read-time fallback displays all 21 curated projects without requiring a database sync, but does not write missing rows to the database. Run the sync only from a trusted machine or job with direct Neon network access. Never put the connection URL in Git, a command log, or a public issue.
+For an **existing Neon `neondb` deployment**, run `npm run db:sync-content` with `DATABASE_URL` supplied securely by the environment. This checks the database identity and runs the insert-only baseline seed (including Bloom RCM and VELTRIO). It then transactionally updates Type Arena's live URL only, renames the existing AR project to Bloom AR with its new source/live URLs and known legacy metadata corrections, and adds missing La Maison artwork. It keeps existing posts, settings, and custom artwork; it does not create or migrate tables. The public read-time fallback displays all 20 curated projects without requiring a database sync, but does not write missing rows to the database. Run the sync only from a trusted machine or job with direct Neon network access. Never put the connection URL in Git, a command log, or a public issue.
 
 `drizzle.config.ts` loads `.env` and uses the same `DATABASE_URL` as the application. This prevents schema tools from accidentally targeting a hardcoded local database.
 
@@ -533,13 +533,12 @@ The current Webloom deployment contains a source-audited catalogue from `github.
 | Featured | `IslamicGuide` | Quran, tafsir, hadith, duas, prayer/Qibla, Hifz, audio, mosque finder, Ramadan/Hajj tools and progress tracking |
 | Featured | `Device-Health-Suite` | Mobile hardware inventory, monitoring, sensors, stress tests and supporting Express/Drizzle services |
 | Featured | `MediFlow` | Medical billing, practice management, claims, RCM, clinical workflows, reporting and user/audit controls |
-| Featured | `PlumberElectric` | Responsive service platform with emergency response, appointments, multilingual content, pricing, blog and admin pages |
+| Featured | `ProFix` | Home-services platform with booking, customer accounts, reviews, and admin workflows |
 | Featured | `RoyalDice` | Cross-platform Ludo-style game with AI and two-to-four player modes |
 | Featured | `Wifi-dashboard` | Network status, devices, speed/latency, bandwidth, heatmap, alerts, scanning and router setup |
 | Archive | `Medx` | Mobile medical operations and billing companion |
 | Archive | `DiagnosticsPro` | Earlier mobile device-diagnostics iteration |
 | Archive | `system-sentinel` | Desktop-oriented system monitoring/stress-test dashboard |
-| Archive | `ProFix` | Focused home-services booking/marketing iteration |
 | Archive | `chess-masters-arena` | Standalone chess-engine/backend prototype with tests and Docker configuration |
 | Archive | `Wifi` | Alternative static network-command dashboard iteration |
 | Archive | `MyBet` | Sports/casino interface concept; not represented as a live wagering service |

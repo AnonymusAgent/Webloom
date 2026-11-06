@@ -53,7 +53,13 @@ export default function GithubWorkPreview({ projects }: { projects: GithubProjec
                       {project.image ? (
                         <Image
                           src={project.image}
-                          alt={project.githubId === "1326109868" ? "Bloom AR source-informed dashboard illustration, not a live screenshot" : project.githubId === "1445700910" ? "VELTRIO brand artwork from its public repository, not a screenshot" : `${project.name} product visualization`}
+                          alt={project.githubId === "1326109868"
+                            ? "Bloom AR source-informed dashboard illustration, not a live screenshot"
+                            : project.githubId === "1445700910"
+                              ? "VELTRIO brand artwork from its public repository, not a screenshot"
+                              : project.githubId === "1241901859"
+                                ? "ProFix illustrative portfolio artwork, not a screenshot"
+                                : `${project.name} product visualization`}
                           fill
                           sizes="(max-width: 768px) 100vw, 50vw"
                           className="object-cover transition-transform duration-700 group-hover/card:scale-[1.04]"
@@ -67,6 +73,11 @@ export default function GithubWorkPreview({ projects }: { projects: GithubProjec
                       <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[0.65rem] font-medium text-white backdrop-blur-md">
                         <BadgeCheck className="h-3 w-3 text-brand" /> Source verified
                       </span>
+                      {project.githubId === "1241901859" && (
+                        <span className="absolute bottom-4 left-4 rounded-full border border-white/20 bg-black/65 px-2.5 py-1 text-[0.6rem] font-medium tracking-wide text-white backdrop-blur-sm">
+                          Illustrative artwork
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-1 items-end justify-between gap-5 p-6 sm:p-7">
                       <div>

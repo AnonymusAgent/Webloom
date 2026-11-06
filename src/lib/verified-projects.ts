@@ -42,7 +42,8 @@ const baseline: GithubProject[] = verifiedProjects.map((project) => ({
 
 /**
  * Show missing curated public work even if the database is empty/unreachable.
- * A database row always wins (including unpublished rows and custom edits).
+ * A database row wins (including unpublished rows and custom edits), except
+ * the explicitly retired PlumberElectric card is hidden from public output.
  * This does not recreate lost database records or expose private imports.
  */
 const PINNED_FEATURED = new Map([
@@ -52,18 +53,23 @@ const PINNED_FEATURED = new Map([
   ["1445700910", 3], // VELTRIO — fourth in Work and the homepage preview
 ]);
 
+// Preserve existing DB rows/admin edits: this is a public presentation change,
+// not a database deletion or an overwrite of the admin's featured flags.
+const HIDDEN_PUBLIC_IDS = new Set(["1241902146"]); // PlumberElectric
+const FEATURED_PUBLIC_IDS = new Set([...PINNED_FEATURED.keys(), "1241901859"]); // ProFix
+
 export function withVerifiedProjects(rows: GithubProject[]): GithubProject[] {
   const knownIds = new Set(rows.map((row) => row.githubId));
-  const knownSlugs = new Set(rows.map((row) => row.slug));
+  const knownSlugs = new Set(rows.filter((row) => !HIDDEN_PUBLIC_IDS.has(row.githubId)).map((row) => row.slug));
   const merged = [
     ...rows,
     ...baseline.filter((project) => !knownIds.has(project.githubId) && !knownSlugs.has(project.slug)),
   ];
   return merged
-    // Respect explicit unpublishing; only the four requested showcase slots
-    // override older featured flags so imported DB rows match the public order.
-    .filter((project) => project.published)
-    .map((project) => PINNED_FEATURED.has(project.githubId) ? { ...project, featured: true } : project)
+    // Respect explicit unpublishing and hide retired PlumberElectric imports.
+    // Promote ProFix while keeping the first four showcase slots pinned.
+    .filter((project) => project.published && !HIDDEN_PUBLIC_IDS.has(project.githubId))
+    .map((project) => FEATURED_PUBLIC_IDS.has(project.githubId) ? { ...project, featured: true } : project)
     .sort((a, b) =>
       Number(b.featured) - Number(a.featured) ||
       (PINNED_FEATURED.get(a.githubId) ?? 99) - (PINNED_FEATURED.get(b.githubId) ?? 99) ||

@@ -4,7 +4,7 @@ import { LIVE_PROJECTS, liveProjectUrl } from "../src/lib/live-projects.ts";
 import { VERIFIED_PROJECT_COVERS, withVerifiedProjects } from "../src/lib/verified-projects.ts";
 
 const projects = withVerifiedProjects([]);
-assert.equal(projects.length, 21, "The curated public baseline should be complete");
+assert.equal(projects.length, 20, "The curated public baseline should be complete");
 assert.equal(new Set(projects.map((project) => project.githubId)).size, projects.length);
 assert.equal(new Set(projects.map((project) => project.slug)).size, projects.length);
 assert.ok(projects.every((project) => project.visibility === "public" && project.published));
@@ -15,6 +15,10 @@ assert.deepEqual(projects.slice(0, 4).map((project) => project.name), ["Bloom AR
 assert.equal(projects[0].githubUrl, "https://github.com/AnonymusAgent/Bloom-AR");
 assert.equal(projects[1].githubUrl, "https://github.com/AnonymusAgent/bloomrcm");
 assert.equal(projects[3].githubUrl, "https://github.com/AnonymusAgent/VELTRIO");
+assert.ok(!projects.some((project) => project.githubId === "1241902146"), "PlumberElectric must not appear publicly");
+const proFix = projects.find((project) => project.githubId === "1241901859");
+assert.ok(proFix && proFix.name === "ProFix" && proFix.featured, "ProFix replaces PlumberElectric among featured projects");
+assert.equal(proFix.githubUrl, "https://github.com/AnonymusAgent/ProFix");
 assert.deepEqual(LIVE_PROJECTS.map(({ name }) => name), ["Bloom AR", "Bloom RCM", "Type Arena", "VELTRIO"]);
 assert.equal(liveProjectUrl("AR-Manager"), "https://bloomar.vercel.app/");
 assert.equal(liveProjectUrl("Bloom-AR"), "https://bloomar.vercel.app/");
@@ -40,10 +44,25 @@ const oldRows = featuredIds.map((id) => ({
 assert.deepEqual(withVerifiedProjects(oldRows).slice(0, 4).map((project) => project.githubId), featuredIds,
   "Older DB featured flags must not displace the requested showcase order");
 
+// An older published DB row must not resurrect PlumberElectric; ProFix's
+// existing unpublished/featured state and custom cover follow the public
+// presentation rules without modifying the stored row.
+const retired = {
+  ...proFix, githubId: "1241902146", repo: "PlumberElectric",
+  slug: "plumber-electric", name: "Home Services Platform", featured: true,
+};
+const fromDb = withVerifiedProjects([retired, { ...proFix, featured: false, image: "/images/custom-profix.jpg" }]);
+assert.equal(fromDb.length, projects.length);
+assert.ok(!fromDb.some((project) => project.githubId === retired.githubId));
+assert.equal(fromDb.find((project) => project.githubId === proFix.githubId).image, "/images/custom-profix.jpg");
+assert.equal(fromDb.find((project) => project.githubId === proFix.githubId).featured, true);
+assert.equal(withVerifiedProjects([{ ...proFix, published: false }]).length, projects.length - 1,
+  "An explicitly unpublished ProFix row must stay hidden");
+
 const unpublished = withVerifiedProjects([{ ...arena, published: false }]);
 assert.equal(unpublished.length, projects.length - 1, "An unpublished DB row must stay hidden");
 assert.ok(!unpublished.some((project) => project.githubId === arena.githubId));
 
 const renamed = withVerifiedProjects([{ ...arena, githubId: "replacement", slug: arena.slug }]);
 assert.equal(renamed.length, projects.length, "A matching slug must not get a duplicate card");
-console.log("21 curated public projects; order, live links, fallbacks, edits, unpublished rows, slugs and images verified.");
+console.log("20 curated public projects; ProFix replacement, order, live links, fallbacks, edits, unpublished rows and images verified.");

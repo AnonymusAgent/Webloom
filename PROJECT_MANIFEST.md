@@ -90,7 +90,7 @@ webloom/
 |---|---|---|
 | `/` | ISR (5 min) | Homepage: static hero, services, work, process, pricing, FAQ, CTA |
 | `/services` | Static | Six service detail blocks + technology overview |
-| `/work` | ISR (5 min) | Source-verified GitHub projects (12 featured + 9 archive) + product concepts |
+| `/work` | ISR (5 min) | Source-verified GitHub projects (12 featured + 8 archive) + product concepts |
 | `/pricing` | ISR (5 min) | Interactive pricing tabs, estimator, FAQ accordion |
 | `/about` | Static | Mission, vision, approach, values, process |
 | `/contact` | Dynamic | Query-prefilled project brief form + cached settings |
@@ -177,7 +177,7 @@ All are documented in `.env.example`. `NODE_ENV` is framework-managed.
 | Runtime data (leads, events, logs in your live DB) | Operational data, not source. Structure + seed content are included; use your existing Neon database or run migrations + seed. |
 | Neon connection string | Secret — never embedded in downloadable source |
 
-**Database data note:** the included `scripts/seed.mjs` can insert missing settings, 2 articles and 21 curated public projects without overwriting existing rows. The public portfolio also uses this shared project list as a read-only fallback for missing rows or database outages. This does not prove that the live Neon database contains those records, and it cannot reconstruct other admin-imported projects.
+**Database data note:** the included `scripts/seed.mjs` can insert missing settings, 2 articles and 20 curated public projects without overwriting existing rows. The public portfolio also uses this shared project list as a read-only fallback for missing rows or database outages. This does not prove that the live Neon database contains those records, and it cannot reconstruct other admin-imported projects.
 
 ## 9. Quick start
 
