@@ -1,5 +1,6 @@
 import { jsonLd } from "@/lib/json-ld";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
@@ -108,7 +109,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Chrome settings={settings}>{children}</Chrome>
         {/* Do not mix local development or Vercel preview traffic into production GA4. */}
         {process.env.NODE_ENV === "production" && process.env.VERCEL_ENV !== "preview" && (
-          <GoogleAnalytics gaId="G-79N9P8BC14" />
+          <>
+            <GoogleAnalytics gaId="G-79N9P8BC14" />
+            <Analytics />
+          </>
         )}
       </body>
     </html>
