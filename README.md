@@ -387,6 +387,8 @@ npm run db:seed
 
 The CLI seed checks the database identity (`neondb` by default) and required tables before writing; for the local `app_db` example only, set `WEBLOOM_EXPECTED_DATABASE=app_db`. No database credentials or data exports belong in the repository.
 
+**Neon SQL Editor alternative:** open `scripts/neon-backfill.sql`, select the existing production `neondb` database, and execute the **entire file at once**. It checks all eight baseline tables/columns before a transactionally insert-only backfill of the 20 curated projects, two articles and two settings; existing records and admin edits are untouched. Its last `SELECT` reports the committed baseline counts (expect 20/20, 2/2, 2/2). If anything errors, run `ROLLBACK` in the same SQL session and review the schema or conflicting rows before retrying. Do **not** paste `drizzle/0000_hot_romulus.sql` into a populated database; that initial DDL is for new/empty databases only. The SQL file contains no connection credentials and can be regenerated with `npm run db:generate-sql`.
+
 For an **existing Neon `neondb` deployment**, run `npm run db:verify` first, then `npm run db:seed` with `DATABASE_URL` supplied securely by the environment to insert only missing baseline rows in one transaction. Rerun `npm run db:verify` to confirm actual row counts; this is the command-line alternative to the admin action. If legacy Type Arena / Bloom AR / La Maison rows still need the previously requested targeted corrections, run `npm run db:sync-content` instead of the plain seed. This checks the database identity and runs the insert-only baseline seed (including Bloom RCM and VELTRIO). It then transactionally updates Type Arena's live URL only, renames the existing AR project to Bloom AR with its new source/live URLs and known legacy metadata corrections, and adds missing La Maison artwork. It keeps existing posts, settings, and custom artwork; it does not create or migrate tables. The public read-time fallback displays all 20 curated projects without requiring a database sync, but does not write missing rows to the database. Run the sync only from a trusted machine or job with direct Neon network access. Never put the connection URL in Git, a command log, or a public issue.
 
 `drizzle.config.ts` loads `.env` and uses the same `DATABASE_URL` as the application. This prevents schema tools from accidentally targeting a hardcoded local database.
@@ -881,7 +883,8 @@ When adding components, test keyboard-only use, 200% zoom, screen-reader labels,
 | `npx drizzle-kit push` | Synchronize the configured PostgreSQL schema directly |
 | `npm run db:verify` | Read-only verification of all eight tables, expected columns and baseline row counts (trusted DB environment only) |
 | `npm run db:seed` | Insert missing baseline settings, articles and portfolio rows in one transaction (trusted DB environment only; preserves existing rows) |
-| `npm run test:db-baseline` | Offline validation of tracked migration and baseline content |
+| `npm run test:db-baseline` | Offline validation of tracked migration, baseline content and generated Neon SQL |
+| `npm run db:generate-sql` | Regenerate the credential-free, insert-only `scripts/neon-backfill.sql` for Neon SQL Editor |
 
 Do not edit `next-env.d.ts`; Next.js generates it.
 

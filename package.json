@@ -9,9 +9,10 @@
     "typecheck": "tsc --noEmit",
     "test:smoke": "node scripts/smoke.mjs",
     "test:portfolio": "node --experimental-strip-types scripts/test-verified-projects.mjs",
-    "test:db-baseline": "node scripts/test-db-baseline.mjs",
+    "test:db-baseline": "node --experimental-strip-types scripts/test-db-baseline.mjs",
     "db:seed": "node scripts/seed.mjs",
     "db:verify": "node scripts/verify-db.mjs",
+    "db:generate-sql": "node --experimental-strip-types scripts/generate-neon-backfill.mjs",
     "db:sync-content": "node scripts/sync-content.mjs"
   },
   "dependencies": {

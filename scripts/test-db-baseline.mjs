@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import baselineContent from "../src/lib/baseline-content.json" with { type: "json" };
 import verifiedProjects from "../src/lib/verified-projects.json" with { type: "json" };
+import { renderNeonBackfill } from "./generate-neon-backfill.mjs";
 
 const journal = JSON.parse(readFileSync("drizzle/meta/_journal.json", "utf8"));
 assert.equal(journal.entries.length, 1);
@@ -20,4 +21,5 @@ assert.equal(new Set(verifiedProjects.map((project) => project.githubId)).size, 
 assert.equal(new Set(verifiedProjects.map((project) => project.slug)).size, verifiedProjects.length);
 assert.equal(typeof baselineContent.SETTINGS.find((setting) => setting.key === "contactEmail")?.value, "string");
 assert.ok(Array.isArray(baselineContent.SETTINGS.find((setting) => setting.key === "socials")?.value));
-console.log("Checked-in schema covers all 8 tables; insert-only baseline has 2 settings, 2 articles and 20 curated projects.");
+assert.equal(readFileSync("scripts/neon-backfill.sql", "utf8"), renderNeonBackfill(), "Neon SQL must match the reviewed baseline generator");
+console.log("Checked-in schema covers all 8 tables; insert-only baseline has 2 settings, 2 articles and 20 curated projects. Neon SQL is up to date.");

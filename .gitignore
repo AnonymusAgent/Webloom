@@ -35,6 +35,7 @@ Thumbs.db
 *.sql
 # Keep generated Drizzle migrations while excluding local SQL dumps and secrets.
 !drizzle/*.sql
+!scripts/neon-backfill.sql
 *.sqlite
 *.sqlite3
 
