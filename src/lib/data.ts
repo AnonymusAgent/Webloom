@@ -200,14 +200,17 @@ export async function getGithubProjects(publishedOnly = true) {
   const rows = await getCachedGithubProjects();
   return (publishedOnly ? withVerifiedProjects(rows) : rows).map((row) => ({
     ...row,
-    // The seed is insert-only and older imports may have no homepage. Keep the
-    // two explicitly verified public deployments in sync on every public card.
+    // The seed is insert-only and older imports may have stale homepages.
+    // Prefer the verified live destinations for the three requested projects.
     homepage: liveProjectUrl(row.repo) ?? row.homepage,
     image: row.image || VERIFIED_PROJECT_COVERS[row.githubId] || null,
     // The older seed misidentified this public TypeScript medical-billing app as
     // a C# desktop asset manager. Correct legacy rows at read time without
     // requiring a database migration or overriding later admin edits.
-    ...(row.repo === "AR-Manager" ? {
+    ...(row.githubId === "1326109868" ? {
+      name: "Bloom AR",
+      repo: "Bloom-AR",
+      githubUrl: "https://github.com/AnonymusAgent/Bloom-AR",
       image: !row.image || row.image === "/images/projects/ar-manager.jpg"
         ? "/images/projects/ar-manager.svg" : row.image,
       category: row.category === "Desktop Application" ? "Medical Billing AR Platform" : row.category,
@@ -217,6 +220,10 @@ export async function getGithubProjects(publishedOnly = true) {
       language: row.language === "C#" ? "TypeScript" : row.language,
       technologies: Array.isArray(row.technologies) && row.technologies.includes("C#")
         ? ["Next.js", "React", "TypeScript", "PostgreSQL", "Drizzle ORM"] : row.technologies,
+    } : {}),
+    ...(row.githubId === "1441273336" ? {
+      name: "Bloom RCM",
+      category: row.category === "Open-source project" ? "Medical Billing & RCM Website" : row.category,
     } : {}),
     pushedAt: row.pushedAt ? asDate(row.pushedAt as Date | string) : null,
     fetchedAt: asDate(row.fetchedAt as Date | string),

@@ -473,9 +473,9 @@
   },
   {
     "githubId": "1326109868",
-    "repo": "AR-Manager",
+    "repo": "Bloom-AR",
     "slug": "ar-manager",
-    "name": "AR Manager",
+    "name": "Bloom AR",
     "category": "Medical Billing AR Platform",
     "summary": "A Next.js accounts-receivable workspace for medical billing, with claims review, denials, payments, authorizations, reporting and role-based workflows.",
     "image": "/images/projects/ar-manager.svg",
@@ -496,5 +496,31 @@
     "pushedAt": "2026-11-03T15:28:36Z",
     "stars": 0,
     "githubUrl": "https://github.com/AnonymusAgent/Bloom-AR"
+  },
+  {
+    "githubId": "1441273336",
+    "repo": "bloomrcm",
+    "slug": "bloom-rcm",
+    "name": "Bloom RCM",
+    "category": "Medical Billing & RCM Website",
+    "summary": "A Next.js website and admin console for an independent medical billing and revenue-cycle management practice, with service pages, consultation enquiries, content management and protected administrative workflows.",
+    "image": "/images/projects/bloom-rcm.jpg",
+    "language": "TypeScript",
+    "tech": [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "PostgreSQL",
+      "Drizzle ORM"
+    ],
+    "topics": [
+      "medical-billing",
+      "revenue-cycle",
+      "business-website"
+    ],
+    "featured": true,
+    "pushedAt": "2026-11-01T01:45:01Z",
+    "stars": 0,
+    "githubUrl": "https://github.com/AnonymusAgent/bloomrcm"
   }
 ]

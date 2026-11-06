@@ -1,6 +1,7 @@
 /**
- * Seed missing baseline content, then bring three previously seeded portfolio
- * entries up to date. Existing posts/settings and custom project images are
+ * Seed missing baseline content (including Bloom RCM), then bring three
+ * previously seeded portfolio entries up to date. Existing posts/settings
+ * and custom project images are
  * preserved. Run from an environment that can reach Neon with DATABASE_URL set.
  * No credentials or database contents are written to disk.
  */
@@ -44,16 +45,16 @@ async function syncPortfolio() {
     await client.query("BEGIN");
     const arena = await client.query(`
       UPDATE public.github_projects SET
-        image = CASE WHEN image IS NULL OR image = '' THEN $2 ELSE image END,
-        homepage = $3, updated_at = now()
+        homepage = $2, updated_at = now()
       WHERE github_id = $1 AND lower(owner) = 'anonymusagent'
       RETURNING github_id
-    `, ["1406597009", "/images/projects/type-arena.jpg", "https://type-arena-silk.vercel.app/"]);
+    `, ["1406597009", "https://arena-skill.vercel.app/"]);
 
     const manager = await client.query(`
       UPDATE public.github_projects SET
         image = CASE WHEN image IS NULL OR image = '' OR image = '/images/projects/ar-manager.jpg' THEN $2 ELSE image END,
-        homepage = $3,
+        homepage = $3, name = 'Bloom AR', repo = 'Bloom-AR',
+        github_url = 'https://github.com/AnonymusAgent/Bloom-AR',
         category = CASE WHEN category = 'Desktop Application' THEN 'Medical Billing AR Platform' ELSE category END,
         summary = CASE WHEN summary LIKE '%desktop resource/asset management%'
           THEN 'A Next.js accounts-receivable workspace for medical billing, with claims review, denials, payments, authorizations, reporting and role-based workflows.'
@@ -64,7 +65,7 @@ async function syncPortfolio() {
         updated_at = now()
       WHERE github_id = $1 AND lower(owner) = 'anonymusagent'
       RETURNING github_id
-    `, ["1326109868", "/images/projects/ar-manager.svg", "https://ar-manager-ten.vercel.app/login"]);
+    `, ["1326109868", "/images/projects/ar-manager.svg", "https://bloomar.vercel.app/"]);
 
     const restaurant = await client.query(`
       UPDATE public.github_projects SET
@@ -84,7 +85,7 @@ async function syncPortfolio() {
         (SELECT count(*)::int FROM public.github_projects) AS projects
     `);
     await client.query("COMMIT");
-    console.log("Synced Type Arena, AR Manager and La Maison Restaurant. Row counts:", counts);
+    console.log("Synced Type Arena, Bloom AR and La Maison Restaurant; insert-only seed includes Bloom RCM. Row counts:", counts);
   } catch (error) {
     await client.query("ROLLBACK").catch(() => {});
     throw error;

@@ -5,7 +5,7 @@
  * by `npx drizzle-kit push` or `npx drizzle-kit migrate`:
  *   - site settings (contact email, owned social links)
  *   - 2 published insight articles
- *   - 19 source-verified GitHub portfolio projects
+ *   - 20 source-verified GitHub portfolio projects
  *
  * The script is idempotent: existing rows are never overwritten, so any
  * edits made in /admin are preserved when re-running it.
