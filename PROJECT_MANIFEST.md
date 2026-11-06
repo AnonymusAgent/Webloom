@@ -177,7 +177,7 @@ All are documented in `.env.example`. `NODE_ENV` is framework-managed.
 | Runtime data (leads, events, logs in your live DB) | Operational data, not source. Structure + seed content are included; use your existing Neon database or run migrations + seed. |
 | Neon connection string | Secret — never embedded in downloadable source |
 
-**Database data note:** the included `scripts/seed.mjs` can insert missing settings, 2 articles and 20 curated public projects without overwriting existing rows. The public portfolio also uses this shared project list as a read-only fallback for missing rows or database outages. This does not prove that the live Neon database contains those records, and it cannot reconstruct other admin-imported projects.
+**Database data note:** `drizzle/0000_hot_romulus.sql` is the checked-in initial migration for new databases; do not replay it on existing tables. `npm run db:verify` reports live table columns and counts only when run from a trusted environment with the configured `DATABASE_URL`. `npm run db:seed` can transactionally insert missing settings, 2 articles and 20 curated public projects without overwriting existing rows. The same insert-only baseline is available as a credential-free `scripts/neon-backfill.sql` for manual execution in Neon SQL Editor (with schema preflight and final counts); after deployment, the authenticated Admin → GitHub Projects page also offers an explicit, confirmed insert-only baseline backfill using the existing connection. The public portfolio uses a read-only fallback for missing rows or database outages. This does not prove the live Neon database contains those records, and the baseline cannot reconstruct unrelated admin-imported projects or fabricate operational data.
 
 ## 9. Quick start
 

@@ -59,6 +59,10 @@ async function request(method = "GET", body?: unknown) {
 export default function GithubProjectsPanel() {
   const [projects, setProjects] = useState<GithubProject[] | null>(null);
   const [tokenConfigured, setTokenConfigured] = useState(false);
+  const [curatedCount, setCuratedCount] = useState(0);
+  const [curatedPresent, setCuratedPresent] = useState(0);
+  const [settingsPresent, setSettingsPresent] = useState(0);
+  const [postsPresent, setPostsPresent] = useState(0);
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -70,6 +74,10 @@ export default function GithubProjectsPanel() {
     const data = await request();
     setProjects(data.projects);
     setTokenConfigured(Boolean(data.tokenConfigured));
+    setCuratedCount(data.curatedCount);
+    setCuratedPresent(data.curatedPresent);
+    setSettingsPresent(data.settingsPresent);
+    setPostsPresent(data.postsPresent);
   }, []);
 
   useEffect(() => {
@@ -93,6 +101,27 @@ export default function GithubProjectsPanel() {
       await load();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Import failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function restoreCurated() {
+    if (!confirm("Insert missing curated projects, default settings and the two baseline articles? Existing rows and admin edits will not be changed.")) return;
+    setBusy(true);
+    setError("");
+    setSuccess("");
+    try {
+      const data = await request("POST", { action: "seed-curated" });
+      await load();
+      const added = `Inserted ${data.projectsInserted} projects, ${data.postsInserted} articles and ${data.settingsInserted} settings.`;
+      if (data.curatedPresent < data.curatedCount || data.postsPresent < 2 || data.settingsPresent < 2) {
+        setError(`${added} Some baseline rows still need review (for example, conflicting slugs).`);
+      } else {
+        setSuccess(`${added} All baseline rows are present; existing edits were preserved.`);
+      }
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Could not restore curated projects.");
     } finally {
       setBusy(false);
     }
@@ -192,6 +221,19 @@ export default function GithubProjectsPanel() {
           </span>
         </div>
 
+        {projects && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+            <p className="text-xs text-mut">
+              Stored baseline: <strong className="text-ink">{curatedPresent}/{curatedCount} projects</strong>,
+              {" "}{postsPresent}/2 articles, {settingsPresent}/2 settings. Public fallback cards do not populate the database.
+            </p>
+            <AdButton variant="ghost" onClick={restoreCurated} disabled={busy || (curatedPresent >= curatedCount && postsPresent >= 2 && settingsPresent >= 2)}>
+              {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+              Insert missing baseline rows
+            </AdButton>
+          </div>
+        )}
+
         {error && (
           <p role="alert" className="mt-4 flex items-start gap-2 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-xs leading-relaxed text-danger">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {error}
@@ -279,7 +321,7 @@ export default function GithubProjectsPanel() {
       ) : projects.length === 0 ? (
         <EmptyState
           title="No GitHub projects imported"
-          blurb="The generic github.com/repos page cannot identify an account. Import specific repository URLs above; verified projects remain drafts until approved."
+          blurb="The public portfolio can use a read-only fallback even when this table is empty. Use Insert missing baseline rows above, or import a specific repository URL as an unpublished draft."
         />
       ) : (
         <div className="space-y-3">
