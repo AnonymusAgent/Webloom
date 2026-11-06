@@ -35,6 +35,9 @@ for (const path of pages) {
       const source = project.githubUrl || `https://github.com/AnonymusAgent/${project.repo}`;
       assert.ok(html.includes(`href="${source}"`), `/work missing ${project.name}'s source link`);
       assert.ok(html.includes(`>${project.name}</h`), `/work missing ${project.name}'s title`);
+      if (!project.featured) {
+        assert.ok(project.image && html.includes(encodeURIComponent(project.image)), `/work missing ${project.name}'s illustrative cover`);
+      }
     }
   }
   if (process.env.EXPECT_BASELINE_PORTFOLIO === "1" && path === "/") {
@@ -67,7 +70,10 @@ const arArtwork = await fetch(new URL("/images/projects/ar-manager.svg", base));
 assert.equal(arArtwork.status, 200, "Source-informed AR Manager artwork should be available");
 assert.match(arArtwork.headers.get("content-type") || "", /image\/svg\+xml/);
 assert.match(await arArtwork.text(), /NOT A LIVE SCREENSHOT/);
-for (const name of ["type-arena", "la-maison-restaurant", "bloom-pos-concept", "noor-concept", "pulse-concept", "clarity-health-concept"]) {
+for (const name of [
+  "type-arena", "la-maison-restaurant", "bloom-pos-concept", "noor-concept", "pulse-concept", "clarity-health-concept",
+  "medx-mobile", "diagnostics-pro", "system-sentinel", "profix", "chess-engine-backend", "wifi-network-command", "mybet-interface", "clone-it-builder",
+]) {
   const artwork = await fetch(new URL(`/images/projects/${name}.jpg`, base));
   assert.equal(artwork.status, 200, `${name} portfolio artwork should be available`);
   assert.match(artwork.headers.get("content-type") || "", /image\/jpeg/);

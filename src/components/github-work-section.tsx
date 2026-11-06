@@ -134,11 +134,14 @@ function ArchiveProject({ project, index }: { project: GithubProject; index: num
           <div className="relative mb-5 aspect-[16/9] overflow-hidden rounded-xl border border-line bg-elev">
             <Image
               src={project.image}
-              alt={`${project.name} illustrative portfolio cover`}
+              alt={`${project.name} illustrative portfolio artwork, not a screenshot`}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
             />
+            <span className="absolute bottom-3 left-3 rounded-full border border-white/20 bg-black/65 px-2.5 py-1 text-[0.6rem] font-medium tracking-wide text-white backdrop-blur-sm">
+              Illustrative artwork
+            </span>
           </div>
         )}
         <div className="flex items-start justify-between gap-4">

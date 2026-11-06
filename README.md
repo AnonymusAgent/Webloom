@@ -49,7 +49,7 @@ The application includes a public marketing website, interactive pricing and pro
 - `prefers-reduced-motion` support throughout the site
 - Focused homepage: services, selected work, process, technology, pricing, FAQ, and conversion sections; full product and technology details remain on Work and Services
 - Dedicated Services, Work, Pricing, About, Contact, Blog, and Legal pages
-- Source-verified GitHub project portfolio with eight original product covers and a supporting repository archive
+- Source-verified GitHub project portfolio with original covers for featured and supporting builds
 - Honest project labels: **Source verified**, **Webloom Product**, or **Product Concept**
 - Testimonials hidden unless genuine published entries exist
 - Homepage insights hidden unless published articles exist
@@ -550,7 +550,7 @@ The current Webloom deployment contains a source-audited catalogue from `github.
 
 The verified Type Arena and AR Manager deployments are linked from their public GitHub project cards (homepage and Work page) and the footer’s **Live projects** links. Type Arena opens its playable home page; AR Manager opens its sign-in page. The URLs are applied when reading existing project records, so older insert-only seed data does not need a database migration. External links open in a new tab with `noopener noreferrer`.
 
-Original portfolio covers are stored under `public/images/projects/`. They are product visualizations based on verified domain/features—not screenshots and not evidence of external client work. Type Arena and La Maison Restaurant have illustrative 16:9 covers; published archive cards now display available covers. Existing database rows without an image receive the corresponding cover at read time without reseeding, while custom images remain intact. The four Webloom product/product-concept entries (BloomPOS, Noor, Pulse and Clarity Health) likewise use clearly labeled illustrative artwork on `/work` and their individual detail pages. These covers depict the product direction, not released-app captures, real patient data, or evidence of delivered client work.
+Original portfolio covers are stored under `public/images/projects/`. They are product visualizations based on verified domain/features—not screenshots and not evidence of external client work. Type Arena, La Maison Restaurant, and all eight previously unillustrated supporting builds have original 16:9 concept covers. Archive cards label these as illustrative artwork. Existing database rows without an image receive the corresponding cover by GitHub ID at read time without reseeding, while custom images remain intact. The four Webloom product/product-concept entries (BloomPOS, Noor, Pulse and Clarity Health) likewise use clearly labeled illustrative artwork on `/work` and their individual detail pages. These covers depict the product direction, not released-app captures, real patient data, or evidence of delivered client work.
 
 #### Blog
 

@@ -1,6 +1,12 @@
 import type { GithubProject } from "@/db/schema";
 import verifiedProjects from "./verified-projects.json" with { type: "json" };
 
+// Covers are shared by the static baseline and older admin-imported rows that
+// have no image yet. An explicitly configured image in the DB always wins.
+export const VERIFIED_PROJECT_COVERS: Record<string, string> = Object.fromEntries(
+  verifiedProjects.filter((project) => project.image).map((project) => [project.githubId, project.image!])
+);
+
 // A public, curated safety net for the portfolio; these are the same records
 // used by the insert-only database seed. No private/discovered repositories are
 // published here. The synthetic IDs exist only in rendered output, never in DB.
