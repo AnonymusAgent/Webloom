@@ -33,6 +33,8 @@ Thumbs.db
 # Local database and backup artifacts
 *.dump
 *.sql
+# Keep generated Drizzle migrations while excluding local SQL dumps and secrets.
+!drizzle/*.sql
 *.sqlite
 *.sqlite3
 

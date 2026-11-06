@@ -363,13 +363,13 @@ Copy the environment example above and adjust credentials for your PostgreSQL in
 
 ### 4. Apply the schema
 
-Option A — run the included migrations (recommended; creates all 8 tables):
+Option A — run the tracked `drizzle/0000_hot_romulus.sql` migration (recommended **for a new, empty database only**; creates all 8 tables):
 
 ```bash
 npx drizzle-kit migrate
 ```
 
-Option B — push the schema directly from source:
+Option B — after reviewing the diff against an **existing** database, push only the needed schema changes directly from source (do not replay the initial migration on existing tables):
 
 ```bash
 npx drizzle-kit push
@@ -377,13 +377,17 @@ npx drizzle-kit push
 
 ### 5. Seed the content (optional)
 
-Recreates the baseline content — site settings, 2 published articles, and the 20 curated public GitHub portfolio projects — on any database. Idempotent: existing rows are never overwritten, so admin edits are preserved. The same public project list in `src/lib/verified-projects.json` is also used as a read-only showcase fallback: if database rows are absent or unavailable, those projects still appear on the homepage and `/work`. Existing rows take precedence, including unpublished rows, so admin edits and explicit unpublishing are respected. The one exception is the retired PlumberElectric project: it is excluded from the curated seed and hidden on public pages by GitHub ID even if an older database row remains. Its database record is not deleted, and the existing ProFix row is featured on public pages without overwriting admin fields. Missing curated entries are shown without silently writing to the database; other historical admin imports (including private repositories) cannot be recovered from this list.
+The live database is already configured independently of this repository. Neither building the site nor the read-only public fallback populates tables. Verify the live schema and row counts with `npm run db:verify` in a trusted environment that already has `DATABASE_URL`; do not share the URL or paste it into source control. The admin GitHub Projects page also shows how many curated rows, articles and settings are actually stored. After deploying this change, an authenticated administrator can choose **Insert missing baseline rows** to transactionally backfill them through the deployed application's existing database connection (confirmation required). It never edits existing rows and does not create synthetic leads, events, logs, testimonials or FAQs.
+
+Inserts missing baseline content — site settings, 2 published articles, and the 20 curated public GitHub portfolio projects — in the verified `neondb` database. Idempotent: existing rows are never overwritten, so admin edits are preserved. The same public project list in `src/lib/verified-projects.json` is also used as a read-only showcase fallback: if database rows are absent or unavailable, those projects still appear on the homepage and `/work`. Existing rows take precedence, including unpublished rows, so admin edits and explicit unpublishing are respected. The one exception is the retired PlumberElectric project: it is excluded from the curated seed and hidden on public pages by GitHub ID even if an older database row remains. Its database record is not deleted, and the existing ProFix row is featured on public pages without overwriting admin fields. Missing curated entries are shown without silently writing to the database; other historical admin imports (including private repositories) cannot be recovered from this list.
 
 ```bash
-node scripts/seed.mjs
+npm run db:seed
 ```
 
-For an **existing Neon `neondb` deployment**, run `npm run db:sync-content` with `DATABASE_URL` supplied securely by the environment. This checks the database identity and runs the insert-only baseline seed (including Bloom RCM and VELTRIO). It then transactionally updates Type Arena's live URL only, renames the existing AR project to Bloom AR with its new source/live URLs and known legacy metadata corrections, and adds missing La Maison artwork. It keeps existing posts, settings, and custom artwork; it does not create or migrate tables. The public read-time fallback displays all 20 curated projects without requiring a database sync, but does not write missing rows to the database. Run the sync only from a trusted machine or job with direct Neon network access. Never put the connection URL in Git, a command log, or a public issue.
+The CLI seed checks the database identity (`neondb` by default) and required tables before writing; for the local `app_db` example only, set `WEBLOOM_EXPECTED_DATABASE=app_db`. No database credentials or data exports belong in the repository.
+
+For an **existing Neon `neondb` deployment**, run `npm run db:verify` first, then `npm run db:seed` with `DATABASE_URL` supplied securely by the environment to insert only missing baseline rows in one transaction. Rerun `npm run db:verify` to confirm actual row counts; this is the command-line alternative to the admin action. If legacy Type Arena / Bloom AR / La Maison rows still need the previously requested targeted corrections, run `npm run db:sync-content` instead of the plain seed. This checks the database identity and runs the insert-only baseline seed (including Bloom RCM and VELTRIO). It then transactionally updates Type Arena's live URL only, renames the existing AR project to Bloom AR with its new source/live URLs and known legacy metadata corrections, and adds missing La Maison artwork. It keeps existing posts, settings, and custom artwork; it does not create or migrate tables. The public read-time fallback displays all 20 curated projects without requiring a database sync, but does not write missing rows to the database. Run the sync only from a trusted machine or job with direct Neon network access. Never put the connection URL in Git, a command log, or a public issue.
 
 `drizzle.config.ts` loads `.env` and uses the same `DATABASE_URL` as the application. This prevents schema tools from accidentally targeting a hardcoded local database.
 
@@ -454,7 +458,7 @@ After changing `src/db/schema.ts`:
 npx drizzle-kit push
 ```
 
-For a mature production environment, generate and review formal migrations rather than relying on direct schema push. This repository currently does not include a migration history directory.
+For a mature production environment, generate and review formal migrations rather than relying on direct schema push. The initial migration is tracked at `drizzle/0000_hot_romulus.sql` alongside its journal and snapshot. Generate, review and commit subsequent migrations rather than applying the initial SQL to a populated database.
 
 ### Inspect the database
 
@@ -875,7 +879,9 @@ When adding components, test keyboard-only use, 200% zoom, screen-reader labels,
 | `npx drizzle-kit migrate` | Apply the included SQL migrations (`drizzle/`) |
 | `npx drizzle-kit generate` | Generate a new migration after schema changes |
 | `npx drizzle-kit push` | Synchronize the configured PostgreSQL schema directly |
-| `node scripts/seed.mjs` | Seed baseline content (idempotent; preserves existing rows) |
+| `npm run db:verify` | Read-only verification of all eight tables, expected columns and baseline row counts (trusted DB environment only) |
+| `npm run db:seed` | Insert missing baseline settings, articles and portfolio rows in one transaction (trusted DB environment only; preserves existing rows) |
+| `npm run test:db-baseline` | Offline validation of tracked migration and baseline content |
 
 Do not edit `next-env.d.ts`; Next.js generates it.
 
@@ -1047,7 +1053,7 @@ The current implementation is complete and functional, but these boundaries shou
 5. **No media upload system:** blog and testimonial admin forms do not upload images or files.
 6. **Markdown-lite articles:** no full Markdown parser, rich-text editor, raw HTML, inline links, or inline image syntax.
 7. **Legal templates need review:** Privacy, Terms, and Cookie pages are explicitly starting templates, not legal advice.
-8. **Direct schema push:** no versioned migration history is included yet.
+8. **Schema migrations:** the initial eight-table migration is versioned in `drizzle/`; review and track new migrations for future changes rather than pushing unreviewed changes to production.
 9. **No Content Security Policy yet:** core security headers are present; add CSP once final third-party origins are known.
 10. **First-party analytics are basic:** unique visitors are not identified; “visitors” in the admin UI represent page-view activity, not deduplicated people.
 11. **Manual GitHub synchronization:** repository imports/refreshes are administrator-triggered; no webhook currently updates projects after every GitHub push.
@@ -1199,13 +1205,13 @@ psql "$DATABASE_URL" -c "select 1;"
 
 ### Tables do not exist
 
-Apply the schema with the included migrations (or `npx drizzle-kit push`):
+First run `npm run db:verify` with the existing configured database connection to identify missing tables or columns. For a **brand-new empty database only**, apply the tracked initial migration:
 
 ```bash
 npx drizzle-kit migrate
 ```
 
-Also confirm `drizzle.config.ts` can read `.env` and that `DATABASE_URL` targets the intended database/branch.
+If tables already exist, do **not** reapply the initial migration: compare the live schema with `src/db/schema.ts` and review any needed non-destructive changes before applying them. Confirm `drizzle.config.ts` uses the intended database/branch. A healthy `/api/health` response checks only connectivity, not table structure or data.
 
 ### Neon connects but tables are not visible
 

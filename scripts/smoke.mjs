@@ -95,6 +95,12 @@ for (const path of ["/not-a-page", "/work/not-a-project", "/blog/not-an-article"
   const res = await fetch(new URL(path, base));
   assert.equal(res.status, 404, `${path} should be a 404`);
 }
+const unauthenticatedSeed = await fetch(new URL("/api/admin/github", base), {
+  method: "POST",
+  headers: { "Content-Type": "application/json", "Origin": base },
+  body: JSON.stringify({ action: "seed-curated" }),
+});
+assert.equal(unauthenticatedSeed.status, 401, "Database repair must require admin authentication");
 const sitemap = await fetch(new URL("/sitemap.xml", base));
 assert.equal(sitemap.status, 200);
 const xml = await sitemap.text();
