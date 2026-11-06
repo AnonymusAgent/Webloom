@@ -45,6 +45,12 @@ const baseline: GithubProject[] = verifiedProjects.map((project) => ({
  * A database row always wins (including unpublished rows and custom edits).
  * This does not recreate lost database records or expose private imports.
  */
+const PINNED_FEATURED = new Map([
+  ["1326109868", 0], // Bloom AR
+  ["1441273336", 1], // Bloom RCM — second in Work and the homepage preview
+  ["1406597009", 2], // Type Arena
+]);
+
 export function withVerifiedProjects(rows: GithubProject[]): GithubProject[] {
   const knownIds = new Set(rows.map((row) => row.githubId));
   const knownSlugs = new Set(rows.map((row) => row.slug));
@@ -53,9 +59,13 @@ export function withVerifiedProjects(rows: GithubProject[]): GithubProject[] {
     ...baseline.filter((project) => !knownIds.has(project.githubId) && !knownSlugs.has(project.slug)),
   ];
   return merged
+    // Respect explicit unpublishing; only the three requested showcase slots
+    // override older featured flags so imported DB rows match the public order.
     .filter((project) => project.published)
+    .map((project) => PINNED_FEATURED.has(project.githubId) ? { ...project, featured: true } : project)
     .sort((a, b) =>
       Number(b.featured) - Number(a.featured) ||
+      (PINNED_FEATURED.get(a.githubId) ?? 99) - (PINNED_FEATURED.get(b.githubId) ?? 99) ||
       (b.pushedAt ? new Date(b.pushedAt).getTime() : 0) -
       (a.pushedAt ? new Date(a.pushedAt).getTime() : 0)
     );

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import verifiedProjects from "../src/lib/verified-projects.json" with { type: "json" };
 
 const base = process.env.BASE_URL || "http://localhost:3000";
-const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://webloom-nu.vercel.app").replace(/\/$/, "");
+const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://web-loom.vercel.app").replace(/\/$/, "");
 const expectedGATags = process.env.VERCEL_ENV === "preview" ? 0 : 1;
 const pages = [
   "/", "/about", "/services", "/work", "/pricing", "/contact", "/blog",
@@ -42,7 +42,14 @@ for (const path of pages) {
   }
   if (process.env.EXPECT_BASELINE_PORTFOLIO === "1" && path === "/") {
     assert.ok(html.includes('id="verified-work-h"'), "Homepage missing verified work showcase");
-    assert.ok(html.includes('href="/work#type-arena"'), "Type Arena should be featured on the homepage");
+    const showcase = ["ar-manager", "bloom-rcm", "type-arena"].map((slug) => html.indexOf(`href="/work#${slug}"`));
+    assert.ok(showcase.every((index) => index >= 0) && showcase[0] < showcase[1] && showcase[1] < showcase[2],
+      "Homepage should feature Bloom AR, Bloom RCM, then Type Arena");
+  }
+  if (process.env.EXPECT_BASELINE_PORTFOLIO === "1" && path === "/work") {
+    const showcase = ["ar-manager", "bloom-rcm", "type-arena"].map((slug) => html.indexOf(`id="${slug}"`));
+    assert.ok(showcase.every((index) => index >= 0) && showcase[0] < showcase[1] && showcase[1] < showcase[2],
+      "Work should feature Bloom AR, Bloom RCM, then Type Arena");
   }
   if (path === "/work" || path.startsWith("/work/")) {
     const slugs = path === "/work" ? ["bloom-pos", "noor", "pulse", "clarity-health"] : [path.split("/")[2]];
@@ -51,8 +58,9 @@ for (const path of pages) {
     }
   }
   for (const [name, href] of [
-    ["Type Arena", "https://type-arena-silk.vercel.app/"],
-    ["AR Manager", "https://ar-manager-ten.vercel.app/login"],
+    ["Bloom AR", "https://bloomar.vercel.app/"],
+    ["Bloom RCM", "https://bloomrcm.vercel.app/"],
+    ["Type Arena", "https://arena-skill.vercel.app/"],
   ]) {
     assert.ok(html.includes(`href="${href}"`), `${path} footer should link to ${name} live site`);
   }
@@ -67,11 +75,11 @@ for (const path of pages) {
   console.log(`${res.status} ${path}`);
 }
 const arArtwork = await fetch(new URL("/images/projects/ar-manager.svg", base));
-assert.equal(arArtwork.status, 200, "Source-informed AR Manager artwork should be available");
+assert.equal(arArtwork.status, 200, "Source-informed Bloom AR artwork should be available");
 assert.match(arArtwork.headers.get("content-type") || "", /image\/svg\+xml/);
 assert.match(await arArtwork.text(), /NOT A LIVE SCREENSHOT/);
 for (const name of [
-  "type-arena", "la-maison-restaurant", "bloom-pos-concept", "noor-concept", "pulse-concept", "clarity-health-concept",
+  "type-arena", "bloom-rcm", "la-maison-restaurant", "bloom-pos-concept", "noor-concept", "pulse-concept", "clarity-health-concept",
   "medx-mobile", "diagnostics-pro", "system-sentinel", "profix", "chess-engine-backend", "wifi-network-command", "mybet-interface", "clone-it-builder",
 ]) {
   const artwork = await fetch(new URL(`/images/projects/${name}.jpg`, base));
