@@ -223,7 +223,7 @@
     "name": "Medx Mobile",
     "category": "Mobile Medical Operations",
     "summary": "A mobile medical operations companion for patients, appointments, claims, eligibility checks, denial management, AR follow-up, payment posting, patient statements, SOAP notes, billing dashboards and reports.",
-    "image": null,
+    "image": "/images/projects/medx-mobile.jpg",
     "language": "TypeScript",
     "tech": [
       "React Native",
@@ -248,7 +248,7 @@
     "name": "DiagnosticsPro",
     "category": "Diagnostics App Iteration",
     "summary": "An earlier mobile hardware-diagnostics build with hardware cards, live monitoring, sensor views, reports, settings, stress-test services, premium controls and local storage.",
-    "image": null,
+    "image": "/images/projects/diagnostics-pro.jpg",
     "language": "TypeScript",
     "tech": [
       "React Native",
@@ -274,7 +274,7 @@
     "name": "System Sentinel",
     "category": "System Monitoring Dashboard",
     "summary": "A desktop-oriented monitoring interface with hardware inventory, live CPU/GPU/storage metrics, vendor and operating-system analytics, stress-test controls and an administrative view.",
-    "image": null,
+    "image": "/images/projects/system-sentinel.jpg",
     "language": "TypeScript",
     "tech": [
       "React",
@@ -300,7 +300,7 @@
     "name": "ProFix",
     "category": "Service Website Iteration",
     "summary": "A focused home-services website with plumbing, electrical and emergency service cards, appointment booking, urgency levels, pricing packages, FAQ, trust signals and responsive marketing pages.",
-    "image": null,
+    "image": "/images/projects/profix.jpg",
     "language": "TypeScript",
     "tech": [
       "React",
@@ -326,7 +326,7 @@
     "name": "Chess Engine Backend",
     "category": "Game Engine Prototype",
     "summary": "A standalone JavaScript chess-engine prototype with board representation, move generation, validation, engine orchestration, automated tests and Docker Compose setup — the lower-level foundation explored before the mobile game.",
-    "image": null,
+    "image": "/images/projects/chess-engine-backend.jpg",
     "language": "JavaScript",
     "tech": [
       "JavaScript",
@@ -351,7 +351,7 @@
     "name": "Network Command Center",
     "category": "Network Dashboard Iteration",
     "summary": "A multi-view network-management prototype covering connected devices, access points, network health, bandwidth usage, alerts, system logs and configuration in a responsive static web interface.",
-    "image": null,
+    "image": "/images/projects/wifi-network-command.jpg",
     "language": "HTML",
     "tech": [
       "HTML",
@@ -376,7 +376,7 @@
     "name": "MyBet Interface",
     "category": "Sports Platform Concept",
     "summary": "A sports and casino interface concept with authentication, protected routes, live sports feeds, odds ticker, sports, esports and casino views plus an administrative dashboard. Presented as an interface build, not a live wagering service.",
-    "image": null,
+    "image": "/images/projects/mybet-interface.jpg",
     "language": "HTML",
     "tech": [
       "Next.js",
@@ -402,7 +402,7 @@
     "name": "Clone It Builder",
     "category": "AI Builder Interface Concept",
     "summary": "A responsive frontend concept for a prompt-led web-app builder, with example project briefs, authentication, careers, documentation, privacy and terms experiences. It demonstrates the product interface rather than claiming an active generation backend.",
-    "image": null,
+    "image": "/images/projects/clone-it-builder.jpg",
     "language": "TypeScript",
     "tech": [
       "React",

@@ -14,7 +14,7 @@ import {
 } from "@/db/schema";
 import { FAQS, SITE } from "@/lib/site";
 import { liveProjectUrl } from "@/lib/live-projects";
-import { withVerifiedProjects } from "@/lib/verified-projects";
+import { VERIFIED_PROJECT_COVERS, withVerifiedProjects } from "@/lib/verified-projects";
 
 /* ------------------------------- settings -------------------------------- */
 
@@ -194,13 +194,8 @@ const getCachedGithubProjects = unstable_cache(
   { revalidate: 300, tags: ["github-projects"] }
 );
 
-// Seed is insert-only. Existing published rows also need a cover when they
-// predate the new artwork; preserve any custom image already set in the DB.
-const PROJECT_COVERS: Record<string, string> = {
-  "type-arena": "/images/projects/type-arena.jpg",
-  "restaurant-web": "/images/projects/la-maison-restaurant.jpg",
-};
-
+// Seed is insert-only. Older published rows receive a shared curated cover
+// at read time when no DB image exists; custom images remain untouched.
 export async function getGithubProjects(publishedOnly = true) {
   const rows = await getCachedGithubProjects();
   return (publishedOnly ? withVerifiedProjects(rows) : rows).map((row) => ({
@@ -208,7 +203,7 @@ export async function getGithubProjects(publishedOnly = true) {
     // The seed is insert-only and older imports may have no homepage. Keep the
     // two explicitly verified public deployments in sync on every public card.
     homepage: liveProjectUrl(row.repo) ?? row.homepage,
-    image: row.image || PROJECT_COVERS[row.repo.toLowerCase()] || null,
+    image: row.image || VERIFIED_PROJECT_COVERS[row.githubId] || null,
     // The older seed misidentified this public TypeScript medical-billing app as
     // a C# desktop asset manager. Correct legacy rows at read time without
     // requiring a database migration or overriding later admin edits.
