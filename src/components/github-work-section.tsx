@@ -33,7 +33,13 @@ function FeaturedProject({ project, index }: { project: GithubProject; index: nu
           {project.image ? (
             <Image
               src={project.image}
-              alt={project.githubId === "1326109868" ? "Bloom AR source-informed dashboard illustration, not a live screenshot" : project.githubId === "1445700910" ? "VELTRIO brand artwork from its public repository, not a screenshot" : `${project.name} product visualization`}
+              alt={project.githubId === "1326109868"
+                ? "Bloom AR source-informed dashboard illustration, not a live screenshot"
+                : project.githubId === "1445700910"
+                  ? "VELTRIO brand artwork from its public repository, not a screenshot"
+                  : project.githubId === "1241901859"
+                    ? "ProFix illustrative portfolio artwork, not a screenshot"
+                    : `${project.name} product visualization`}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
@@ -49,6 +55,11 @@ function FeaturedProject({ project, index }: { project: GithubProject; index: nu
               <BadgeCheck className="h-3 w-3 text-brand" /> Source verified
             </Chip>
           </div>
+          {project.githubId === "1241901859" && (
+            <span className="absolute bottom-4 left-5 rounded-full border border-white/20 bg-black/65 px-2.5 py-1 text-[0.6rem] font-medium tracking-wide text-white backdrop-blur-sm">
+              Illustrative artwork
+            </span>
+          )}
           <span className="absolute bottom-4 right-5 font-mono text-xs text-white/80">
             {String(index + 1).padStart(2, "0")}
           </span>

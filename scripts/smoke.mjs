@@ -31,6 +31,10 @@ for (const path of pages) {
   assert.equal(canonical, site + (path === "/" ? "" : path), `${path} needs a canonical`);
   assert.equal(html.includes('name="robots" content="noindex'), path.startsWith("/legal/"), `${path} robots mismatch`);
   if (process.env.EXPECT_BASELINE_PORTFOLIO === "1" && path === "/work") {
+    assert.ok(html.includes('id="profix"') && html.includes(encodeURIComponent("/images/projects/profix.jpg")),
+      "ProFix should be a featured project with its existing artwork");
+    assert.ok(!html.includes('id="plumber-electric"') && !html.includes('href="https://github.com/AnonymusAgent/PlumberElectric"'),
+      "PlumberElectric should no longer appear publicly");
     for (const project of verifiedProjects) {
       const source = project.githubUrl || `https://github.com/AnonymusAgent/${project.repo}`;
       assert.ok(html.includes(`href="${source}"`), `/work missing ${project.name}'s source link`);

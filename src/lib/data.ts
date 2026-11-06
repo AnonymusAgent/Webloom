@@ -228,6 +228,9 @@ export async function getGithubProjects(publishedOnly = true) {
     ...(row.githubId === "1445700910" ? {
       category: row.category === "Open-source project" ? "Video Streaming & Creator Platform" : row.category,
     } : {}),
+    ...(row.githubId === "1241901859" ? {
+      category: row.category === "Service Website Iteration" ? "Service Business Web Platform" : row.category,
+    } : {}),
     pushedAt: row.pushedAt ? asDate(row.pushedAt as Date | string) : null,
     fetchedAt: asDate(row.fetchedAt as Date | string),
     createdAt: asDate(row.createdAt as Date | string),

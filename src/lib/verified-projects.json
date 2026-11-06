@@ -138,33 +138,6 @@
     "stars": 0
   },
   {
-    "githubId": "1241902146",
-    "repo": "PlumberElectric",
-    "slug": "plumber-electric",
-    "name": "Home Services Platform",
-    "category": "Service Business Web Platform",
-    "summary": "A responsive plumbing and electrical services platform with separate service journeys, emergency response, appointment booking, transparent pricing, multilingual content, FAQs, testimonials, blog, careers, admin, contact and legal pages.",
-    "image": "/images/projects/home-services.jpg",
-    "language": "TypeScript",
-    "tech": [
-      "React",
-      "TypeScript",
-      "Vite",
-      "React Router",
-      "Tailwind CSS",
-      "React Hook Form",
-      "Zod"
-    ],
-    "topics": [
-      "home-services",
-      "booking",
-      "responsive-web"
-    ],
-    "featured": true,
-    "pushedAt": "2026-05-19T23:17:47Z",
-    "stars": 0
-  },
-  {
     "githubId": "1284557364",
     "repo": "RoyalDice",
     "slug": "royal-dice",
@@ -298,7 +271,7 @@
     "repo": "ProFix",
     "slug": "profix",
     "name": "ProFix",
-    "category": "Service Website Iteration",
+    "category": "Service Business Web Platform",
     "summary": "A focused home-services website with plumbing, electrical and emergency service cards, appointment booking, urgency levels, pricing packages, FAQ, trust signals and responsive marketing pages.",
     "image": "/images/projects/profix.jpg",
     "language": "TypeScript",
@@ -315,7 +288,7 @@
       "booking",
       "marketing-site"
     ],
-    "featured": false,
+    "featured": true,
     "pushedAt": "2026-05-18T17:58:25Z",
     "stars": 0
   },
