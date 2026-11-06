@@ -201,7 +201,7 @@ export async function getGithubProjects(publishedOnly = true) {
   return (publishedOnly ? withVerifiedProjects(rows) : rows).map((row) => ({
     ...row,
     // The seed is insert-only and older imports may have stale homepages.
-    // Prefer the verified live destinations for the three requested projects.
+    // Prefer the verified live destinations for the featured projects.
     homepage: liveProjectUrl(row.repo) ?? row.homepage,
     image: row.image || VERIFIED_PROJECT_COVERS[row.githubId] || null,
     // The older seed misidentified this public TypeScript medical-billing app as
@@ -224,6 +224,9 @@ export async function getGithubProjects(publishedOnly = true) {
     ...(row.githubId === "1441273336" ? {
       name: "Bloom RCM",
       category: row.category === "Open-source project" ? "Medical Billing & RCM Website" : row.category,
+    } : {}),
+    ...(row.githubId === "1445700910" ? {
+      category: row.category === "Open-source project" ? "Video Streaming & Creator Platform" : row.category,
     } : {}),
     pushedAt: row.pushedAt ? asDate(row.pushedAt as Date | string) : null,
     fetchedAt: asDate(row.fetchedAt as Date | string),

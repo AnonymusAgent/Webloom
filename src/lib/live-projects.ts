@@ -3,6 +3,7 @@ export const LIVE_PROJECTS = [
   { repo: "bloom-ar", name: "Bloom AR", href: "https://bloomar.vercel.app/" },
   { repo: "bloomrcm", name: "Bloom RCM", href: "https://bloomrcm.vercel.app/" },
   { repo: "type-arena", name: "Type Arena", href: "https://arena-skill.vercel.app/" },
+  { repo: "veltrio", name: "VELTRIO", href: "https://veltrio-new.vercel.app/" },
 ] as const;
 
 export function liveProjectUrl(repo: string): string | null {

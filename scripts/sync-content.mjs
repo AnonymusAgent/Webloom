@@ -1,5 +1,5 @@
 /**
- * Seed missing baseline content (including Bloom RCM), then bring three
+ * Seed missing baseline content (including Bloom RCM and VELTRIO), then bring three
  * previously seeded portfolio entries up to date. Existing posts/settings
  * and custom project images are
  * preserved. Run from an environment that can reach Neon with DATABASE_URL set.
@@ -85,7 +85,7 @@ async function syncPortfolio() {
         (SELECT count(*)::int FROM public.github_projects) AS projects
     `);
     await client.query("COMMIT");
-    console.log("Synced Type Arena, Bloom AR and La Maison Restaurant; insert-only seed includes Bloom RCM. Row counts:", counts);
+    console.log("Synced Type Arena, Bloom AR and La Maison Restaurant; insert-only seed includes Bloom RCM and VELTRIO. Row counts:", counts);
   } catch (error) {
     await client.query("ROLLBACK").catch(() => {});
     throw error;

@@ -42,14 +42,14 @@ for (const path of pages) {
   }
   if (process.env.EXPECT_BASELINE_PORTFOLIO === "1" && path === "/") {
     assert.ok(html.includes('id="verified-work-h"'), "Homepage missing verified work showcase");
-    const showcase = ["ar-manager", "bloom-rcm", "type-arena"].map((slug) => html.indexOf(`href="/work#${slug}"`));
-    assert.ok(showcase.every((index) => index >= 0) && showcase[0] < showcase[1] && showcase[1] < showcase[2],
-      "Homepage should feature Bloom AR, Bloom RCM, then Type Arena");
+    const showcase = ["ar-manager", "bloom-rcm", "type-arena", "veltrio"].map((slug) => html.indexOf(`href="/work#${slug}"`));
+    assert.ok(showcase.every((index) => index >= 0) && showcase[0] < showcase[1] && showcase[1] < showcase[2] && showcase[2] < showcase[3],
+      "Homepage should feature Bloom AR, Bloom RCM, Type Arena, then VELTRIO");
   }
   if (process.env.EXPECT_BASELINE_PORTFOLIO === "1" && path === "/work") {
-    const showcase = ["ar-manager", "bloom-rcm", "type-arena"].map((slug) => html.indexOf(`id="${slug}"`));
-    assert.ok(showcase.every((index) => index >= 0) && showcase[0] < showcase[1] && showcase[1] < showcase[2],
-      "Work should feature Bloom AR, Bloom RCM, then Type Arena");
+    const showcase = ["ar-manager", "bloom-rcm", "type-arena", "veltrio"].map((slug) => html.indexOf(`id="${slug}"`));
+    assert.ok(showcase.every((index) => index >= 0) && showcase[0] < showcase[1] && showcase[1] < showcase[2] && showcase[2] < showcase[3],
+      "Work should feature Bloom AR, Bloom RCM, Type Arena, then VELTRIO");
   }
   if (path === "/work" || path.startsWith("/work/")) {
     const slugs = path === "/work" ? ["bloom-pos", "noor", "pulse", "clarity-health"] : [path.split("/")[2]];
@@ -61,6 +61,7 @@ for (const path of pages) {
     ["Bloom AR", "https://bloomar.vercel.app/"],
     ["Bloom RCM", "https://bloomrcm.vercel.app/"],
     ["Type Arena", "https://arena-skill.vercel.app/"],
+    ["VELTRIO", "https://veltrio-new.vercel.app/"],
   ]) {
     assert.ok(html.includes(`href="${href}"`), `${path} footer should link to ${name} live site`);
   }
@@ -79,7 +80,7 @@ assert.equal(arArtwork.status, 200, "Source-informed Bloom AR artwork should be 
 assert.match(arArtwork.headers.get("content-type") || "", /image\/svg\+xml/);
 assert.match(await arArtwork.text(), /NOT A LIVE SCREENSHOT/);
 for (const name of [
-  "type-arena", "bloom-rcm", "la-maison-restaurant", "bloom-pos-concept", "noor-concept", "pulse-concept", "clarity-health-concept",
+  "type-arena", "bloom-rcm", "veltrio", "la-maison-restaurant", "bloom-pos-concept", "noor-concept", "pulse-concept", "clarity-health-concept",
   "medx-mobile", "diagnostics-pro", "system-sentinel", "profix", "chess-engine-backend", "wifi-network-command", "mybet-interface", "clone-it-builder",
 ]) {
   const artwork = await fetch(new URL(`/images/projects/${name}.jpg`, base));
